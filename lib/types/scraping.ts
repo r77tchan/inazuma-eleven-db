@@ -1,5 +1,5 @@
 export type ScrapingResult = {
-  characterUrlList: CharacterUrl[];
+  characterDetailList: CharacterDetail[];
   totalListCount: number;
   fetchedAt: string;
 };

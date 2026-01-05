@@ -1,13 +1,14 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-import type { ScrapingResult } from "@/lib/types/scraping";
+import type { CharacterDetail, ScrapingResult } from "@/lib/types/scraping";
 
 export default function ScrapingPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [characterData, setCharacterData] = useState<ScrapingResult | null>(
     null,
   );
+  const [hitCharacters, setHitCharacters] = useState<CharacterDetail[]>([]);
 
   const handleStartScraping = async () => {
     setIsRunning(true);
@@ -26,6 +27,30 @@ export default function ScrapingPage() {
       setIsRunning(false);
     }
   };
+
+  const searchCharacterData = () => {
+    const tmpCharacters: CharacterDetail[] = [];
+    let maxKick = 0;
+    characterData?.characterDetailList.forEach((character) => {
+      const kickValue = parseInt(character.kick, 10);
+      if (kickValue > maxKick) {
+        maxKick = kickValue;
+      }
+    });
+    characterData?.characterDetailList.forEach((character) => {
+      const kickValue = parseInt(character.kick, 10);
+      if (kickValue === maxKick) {
+        tmpCharacters.push(character);
+      }
+    });
+    setHitCharacters(tmpCharacters);
+  };
+
+  useEffect(() => {
+    if (characterData) {
+      searchCharacterData();
+    }
+  }, [characterData]);
 
   return (
     <div>
@@ -46,7 +71,7 @@ export default function ScrapingPage() {
         <h2>スクレイピング結果:</h2>
         <p>取得件数: {characterData?.totalListCount}</p>
         <p>取得日時: {characterData?.fetchedAt}</p>
-        {characterData?.characterUrlList.map((character) => (
+        {hitCharacters?.map((character) => (
           <ul key={character.characterNo} className="p-4">
             <li>キャラクター番号: {character.characterNo}</li>
             <li>
@@ -60,6 +85,7 @@ export default function ScrapingPage() {
                 {character.detailUrl}
               </a>
             </li>
+            <li>名前: {character.fullName.map((n) => n.name).join(" ")}</li>
           </ul>
         ))}
       </div>
