@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { runHelloProgram } from "@/lib/helloProgram";
+import { runScraping } from "@/lib/scraping";
 
 export async function POST() {
-  await runHelloProgram();
+  const result = await runScraping();
   return NextResponse.json(
-    { message: "プログラムが実行されました" },
+    { message: "スクレイピングを実行しました", result },
     { status: 200 },
   );
 }
