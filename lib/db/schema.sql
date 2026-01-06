@@ -1,3 +1,4 @@
+-- SupabaseのSQLエディタで実行する用のスキーマ定義ファイル
 -- scraped_character_details: スクレイピングした選手(キャラ)詳細を保存
 -- nickname / full_name は順序が重要なので JSONB配列で保持
 -- fetched_at はクエリしやすい timestamptz で保持

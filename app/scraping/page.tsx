@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 import type { CharacterDetail, ScrapingResult } from "@/lib/types";
+import Link from "next/link";
 
 export default function ScrapingPage() {
   const [isRunning, setIsRunning] = useState(false);
@@ -55,9 +56,14 @@ export default function ScrapingPage() {
   return (
     <div>
       <h1 className="bg-green-100 p-4 font-bold">スクレイピングページ</h1>
-      <p className="bg-pink-100 p-4">
-        ここでは、スクレイピングに関する情報やツールを提供しています。
-      </p>
+      <div className="bg-pink-100 p-4">
+        <p>ここでは、スクレイピングに関する情報やツールを提供しています。</p>
+        <p>
+          <Link href="/" className="text-blue-600 underline">
+            ホームに戻る
+          </Link>
+        </p>
+      </div>
       <div className="flex justify-center p-4">
         <button
           className="border bg-amber-100 p-2 hover:scale-105 hover:cursor-pointer hover:bg-amber-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:bg-amber-100"
