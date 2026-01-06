@@ -7,7 +7,9 @@ import type {
   CharacterName,
   CharacterUrl,
   ScrapingResult,
-} from "@/lib/types/scraping";
+} from "@/lib/types";
+
+type CharacterDetailBase = Omit<CharacterDetail, "fetchedAt">;
 
 // 対象のベースURL
 const baseUrl = "https://zukan.inazuma.jp/";
@@ -169,8 +171,8 @@ async function getUrlList(totalPageNumber: number): Promise<CharacterUrl[]> {
 // 各キャラクター詳細ページから必要な情報を取得する関数
 async function getDetailList(
   characterUrlList: CharacterUrl[],
-): Promise<CharacterDetail[]> {
-  const characterDetailList: CharacterDetail[] = [];
+): Promise<CharacterDetailBase[]> {
+  const characterDetailList: CharacterDetailBase[] = [];
 
   let count = 0;
   for (const character of characterUrlList) {
@@ -266,9 +268,15 @@ export async function runScraping(): Promise<ScrapingResult> {
   const characterUrlList = await getUrlList(totalPageNumber);
   const characterDetailList = await getDetailList(characterUrlList);
 
+  const fetchedAt = new Date().toISOString();
+  const characterDetailListWithFetchedAt = characterDetailList.map((c) => ({
+    ...c,
+    fetchedAt,
+  }));
+
   return {
-    characterDetailList,
-    totalListCount: characterDetailList.length,
-    fetchedAt: new Date().toISOString(),
+    characterDetailList: characterDetailListWithFetchedAt,
+    totalListCount: characterDetailListWithFetchedAt.length,
+    fetchedAt,
   };
 }

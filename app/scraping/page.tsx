@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
-import type { CharacterDetail, ScrapingResult } from "@/lib/types/scraping";
+import type { CharacterDetail, ScrapingResult } from "@/lib/types";
 
 export default function ScrapingPage() {
   const [isRunning, setIsRunning] = useState(false);

@@ -35,4 +35,5 @@ export type CharacterDetail = {
   schoolYear: string;
   gender: string;
   characterRole: string;
+  fetchedAt: string;
 };
