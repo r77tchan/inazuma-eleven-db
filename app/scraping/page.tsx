@@ -10,6 +10,7 @@ export default function ScrapingPage() {
     null,
   );
   const [hitCharacters, setHitCharacters] = useState<CharacterDetail[]>([]);
+  const [fetchResponseMessage, setFetchResponseMessage] = useState<string>("");
 
   const handleStartScraping = async () => {
     setIsRunning(true);
@@ -20,10 +21,9 @@ export default function ScrapingPage() {
       console.log(res);
       const data = await res.json();
       console.log(data);
+      setFetchResponseMessage(data.message);
 
       setCharacterData(data.result);
-
-      if (!res.ok) throw new Error("Failed to start scraping");
     } finally {
       setIsRunning(false);
     }
@@ -57,7 +57,17 @@ export default function ScrapingPage() {
     <div>
       <h1 className="bg-green-100 p-4 font-bold">スクレイピングページ</h1>
       <div className="bg-pink-100 p-4">
-        <p>ここでは、スクレイピングに関する情報やツールを提供しています。</p>
+        <p>
+          <a
+            href="https://zukan.inazuma.jp/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 underline"
+          >
+            inagle
+          </a>
+          用スクレイピングページです。
+        </p>
         <p>
           <Link href="/" className="text-blue-600 underline">
             ホームに戻る
@@ -73,6 +83,9 @@ export default function ScrapingPage() {
           {isRunning ? "処理中..." : "スクレイピング開始"}
         </button>
       </div>
+      {fetchResponseMessage && (
+        <div className="p-4 text-red-500">{fetchResponseMessage}</div>
+      )}
       <div className="p-4">
         <h2>スクレイピング結果:</h2>
         <p>取得件数: {characterData?.totalListCount}</p>
