@@ -6,6 +6,7 @@
   --bar: #000000;
   --search-border: #485fc7;
   --search-border-shadow: #3273dc40;
+  --search-border-shadow-active: #28ff4860;
   --search-button-background: #ffe900;
 }
 
@@ -15,6 +16,7 @@
   --color-bar: var(--bar);
   --color-search-border: var(--search-border);
   --color-search-border-shadow: var(--search-border-shadow);
+  --color-search-border-shadow-active: var(--search-border-shadow-active);
   --color-search-button-background: var(--search-button-background);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -24,6 +26,7 @@
   :root {
     --background: #000000;
     --foreground: #ffffff;
+    --search-button-background: #272901;
     --bar: #1e2939;
   }
 }
