@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 
 import { runScraping } from "@/lib/scraping";
 import { upsertScrapedCharacterDetails } from "@/lib/db/upsertScrapedCharacterDetails";
@@ -16,6 +17,9 @@ export async function POST() {
 
     const result = await runScraping();
     await upsertScrapedCharacterDetails(result.characterDetailList);
+
+    // 検索側の unstable_cache(tags: ["scraped_character_details"]) を破棄して作り直す
+    revalidateTag("scraped_character_details", "default");
 
     return NextResponse.json(
       { message: "スクレイピングを実行しDBに保存しました", result },
