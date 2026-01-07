@@ -168,7 +168,7 @@ export default function Home() {
     <div>
       <div className="py-16">
         <div className="mx-0">
-          <div className="bg-search-bg container mx-auto rounded-4xl">
+          <div className="bg-search-bg container mx-auto sm:rounded-4xl">
             <div className="flex justify-center">
               <h2 className="bg-bar my-8 flex w-7xl flex-col items-center justify-center bg-[repeating-linear-gradient(-45deg,transparent,transparent_6px,rgb(20,20,20)_6px,rgb(20,20,20)_12px)] px-2 py-16 text-center text-2xl leading-12 font-bold text-white sm:mx-4">
                 <span>イナズマイレブン</span>
