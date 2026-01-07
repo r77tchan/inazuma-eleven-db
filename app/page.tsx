@@ -89,7 +89,7 @@ export default function Home() {
     <div>
       <div className="py-16">
         <div className="mx-2">
-          <div className="container mx-auto rounded-4xl border">
+          <div className="container mx-auto rounded-4xl">
             <div className="flex justify-center">
               <h2 className="bg-bar mx-4 my-8 flex w-7xl flex-col items-center justify-center bg-[repeating-linear-gradient(-45deg,transparent,transparent_6px,rgb(20,20,20)_6px,rgb(20,20,20)_12px)] px-2 py-16 text-center text-2xl leading-12 font-bold text-white">
                 <span>イナズマイレブン</span>
@@ -109,7 +109,7 @@ export default function Home() {
               >
                 <input
                   type="text"
-                  className="flex-1 rounded-4xl rounded-r-none p-4 outline-none"
+                  className="bg-background flex-1 rounded-4xl rounded-r-none p-4 outline-none"
                   placeholder="イナイレDBでキャラクター名またはニックネーム／よみがなを検索"
                   ref={inputRef}
                   disabled={isPending}
@@ -146,7 +146,7 @@ export default function Home() {
         </div>
         {searchResult ? (
           <div className="mt-8 overflow-x-auto">
-            <table className="mx-auto border-collapse text-center whitespace-nowrap">
+            <table className="mx-auto border-collapse border text-center whitespace-nowrap">
               <thead>
                 <tr className="*:border *:p-2">
                   <th>No.</th>
@@ -170,10 +170,13 @@ export default function Home() {
               </thead>
               <tbody>
                 {searchResult.rows.map((row) => (
-                  <tr key={row.character_no} className="*:border *:p-2">
+                  <tr
+                    key={row.character_no}
+                    className="hover:bg-search-border-shadow *:border *:p-2"
+                  >
                     <td>{row.character_no}</td>
                     <td className="text-left">
-                      <div className="flex items-center gap-3">
+                      <div className="inline-flex w-max items-center gap-3 whitespace-nowrap">
                         <Image
                           src={row.image_url}
                           alt={row.full_name.map((n) => n.name).join("")}
@@ -182,7 +185,7 @@ export default function Home() {
                           sizes="48px"
                           className="h-12 w-12 shrink-0"
                         />
-                        <div className="flex flex-col">
+                        <div className="flex w-max flex-col">
                           <div>{row.full_name.map((n) => n.name).join("")}</div>
                           <div className="text-xs">
                             {row.full_name.map((n) => n.ruby).join("")}
@@ -191,7 +194,7 @@ export default function Home() {
                       </div>
                     </td>
                     <td className="text-left">
-                      <div className="flex flex-col">
+                      <div className="flex w-max flex-col whitespace-nowrap">
                         <div>{row.nickname.map((n) => n.name).join("")}</div>
                         <div className="text-xs">
                           {row.nickname.map((n) => n.ruby).join("")}

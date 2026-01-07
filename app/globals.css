@@ -9,6 +9,7 @@
   --search-border-shadow-active: #28ff4860;
   --search-border-shadow-disabled: #ff393950;
   --search-button-background: #ffe900;
+  --search-bg: #eeeeee;
 }
 
 @theme inline {
@@ -20,6 +21,7 @@
   --color-search-border-shadow-active: var(--search-border-shadow-active);
   --color-search-border-shadow-disabled: var(--search-border-shadow-disabled);
   --color-search-button-background: var(--search-button-background);
+  --color-search-bg: var(--search-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -30,6 +32,7 @@
     --foreground: #ffffff;
     --search-button-background: #272901;
     --bar: #1e2939;
+    --search-bg: #111111;
   }
 }
 
