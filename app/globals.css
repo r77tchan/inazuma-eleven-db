@@ -10,6 +10,9 @@
   --search-border-shadow-disabled: #ff393950;
   --search-button-background: #ffe900;
   --search-bg: #eeeeee;
+  --tab-bg-selected: #dddddd;
+  --tab-bg: #cccccc;
+  --tab-bg-aqua: #73a2c780;
 }
 
 @theme inline {
@@ -22,6 +25,9 @@
   --color-search-border-shadow-disabled: var(--search-border-shadow-disabled);
   --color-search-button-background: var(--search-button-background);
   --color-search-bg: var(--search-bg);
+  --color-tab-bg-selected: var(--tab-bg-selected);
+  --color-tab-bg: var(--tab-bg);
+  --color-tab-bg-aqua: var(--tab-bg-aqua);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -33,6 +39,8 @@
     --search-button-background: #272901;
     --bar: #1e2939;
     --search-bg: #111111;
+    --tab-bg-selected: #222222;
+    --tab-bg: #333333;
   }
 }
 

@@ -167,10 +167,10 @@ export default function Home() {
   return (
     <div>
       <div className="py-16">
-        <div className="mx-2">
-          <div className="container mx-auto rounded-4xl">
+        <div className="mx-0">
+          <div className="bg-search-bg container mx-auto rounded-4xl">
             <div className="flex justify-center">
-              <h2 className="bg-bar mx-4 my-8 flex w-7xl flex-col items-center justify-center bg-[repeating-linear-gradient(-45deg,transparent,transparent_6px,rgb(20,20,20)_6px,rgb(20,20,20)_12px)] px-2 py-16 text-center text-2xl leading-12 font-bold text-white">
+              <h2 className="bg-bar my-8 flex w-7xl flex-col items-center justify-center bg-[repeating-linear-gradient(-45deg,transparent,transparent_6px,rgb(20,20,20)_6px,rgb(20,20,20)_12px)] px-2 py-16 text-center text-2xl leading-12 font-bold text-white sm:mx-4">
                 <span>イナズマイレブン</span>
                 <span>英雄たちのヴィクトリーロード</span>
                 <span>非公式データベース</span>
@@ -178,7 +178,7 @@ export default function Home() {
             </div>
             <div className="flex justify-center">
               <div
-                className={`border-search-border mx-4 my-8 flex w-7xl rounded-4xl border ${
+                className={`border-search-border mx-2 my-8 flex w-7xl rounded-4xl border sm:mx-4 ${
                   isPending
                     ? "shadow-[0_0_0_4px_var(--color-search-border-shadow-disabled)]"
                     : isInputFocused
@@ -219,6 +219,25 @@ export default function Home() {
                     <span>{isPending ? "検索中" : "検索"}</span>
                   </span>
                 </button>
+              </div>
+            </div>
+            <div className="mx-2 pb-8 sm:mx-4">
+              <div className="flex">
+                <div className="bg-background border-search-button-background cursor-pointer border border-b-0 p-2">
+                  更新履歴
+                </div>
+                <div className="bg-background border-search-button-background cursor-pointer border border-b-0 border-l-0 p-2">
+                  検索オプション
+                </div>
+                <div className="border-search-button-background flex-1 border-b"></div>
+              </div>
+              <div className="border-search-button-background bg-background border border-t-0 p-2">
+                <ul>
+                  <li>aaa</li>
+                  <li>aaa</li>
+                  <li>aaa</li>
+                  <li>aaa</li>
+                </ul>
               </div>
             </div>
           </div>
