@@ -9,6 +9,10 @@ import Image from "next/image";
 
 export default function Home() {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const tableScrollRef = useRef<HTMLDivElement | null>(null);
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragStartScrollLeftRef = useRef(0);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [searchResult, setSearchResult] =
@@ -85,6 +89,47 @@ export default function Home() {
     if (active instanceof HTMLElement) active.blur();
   };
 
+  const onTablePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    // タッチはブラウザ標準スクロールに任せる
+    if (e.pointerType !== "mouse") return;
+    if (e.button !== 0) return;
+
+    const el = tableScrollRef.current;
+    if (!el) return;
+
+    isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX;
+    dragStartScrollLeftRef.current = el.scrollLeft;
+    el.setPointerCapture(e.pointerId);
+
+    // テキスト選択を完全に抑止
+    e.preventDefault();
+  };
+
+  const onTablePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    const el = tableScrollRef.current;
+    if (!el) return;
+
+    const dx = e.clientX - dragStartXRef.current;
+    el.scrollLeft = dragStartScrollLeftRef.current - dx;
+    // ドラッグ中のテキスト選択を抑える
+    e.preventDefault();
+  };
+
+  const endTableDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    const el = tableScrollRef.current;
+    if (el) {
+      try {
+        el.releasePointerCapture(e.pointerId);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
   return (
     <div>
       <div className="py-16">
@@ -145,7 +190,14 @@ export default function Home() {
           </div>
         </div>
         {searchResult ? (
-          <div className="mt-8 overflow-x-auto">
+          <div
+            className="mt-8 cursor-grab overflow-x-auto select-none active:cursor-grabbing"
+            ref={tableScrollRef}
+            onPointerDown={onTablePointerDown}
+            onPointerMove={onTablePointerMove}
+            onPointerUp={endTableDrag}
+            onPointerCancel={endTableDrag}
+          >
             <table className="mx-auto border-collapse border text-center whitespace-nowrap">
               <thead>
                 <tr className="*:border *:p-2">
