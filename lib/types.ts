@@ -37,3 +37,29 @@ export type CharacterDetail = {
   characterRole: string;
   fetchedAt: string;
 };
+
+export type ScrapedCharacterDetailRow = {
+  character_no: number | null;
+  detail_url: string;
+  nickname: CharacterName[];
+  full_name: CharacterName[];
+  image_url: string;
+  works: string;
+  description: string;
+  position: string;
+  element: string;
+  kick: number | null;
+  control: number | null;
+  technique: number | null;
+  pressure: number | null;
+  physical: number | null;
+  agility: number | null;
+  intelligence: number | null;
+  generation: string;
+  school_year: string;
+  gender: string;
+  character_role: string;
+  fetched_at: string;
+  created_at: string;
+  updated_at: string;
+};

@@ -1,67 +1,231 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
+
+import { searchCharactersAction } from "@/app/actions/searchCharacters";
+import type { SearchCharactersResponse } from "@/app/actions/searchCharacters";
+import Image from "next/image";
 
 export default function Home() {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
+  const [searchResult, setSearchResult] =
+    useState<SearchCharactersResponse | null>(null);
+  const [isPending, startTransition] = useTransition();
 
-  const handleSearch = () => {
-    // 検索処理はここに追加（現状はフォーカス解除のみ）
+  const formatShootAT = (kick: number | null, control: number | null) => {
+    if (kick == null || control == null) return "-";
+    return kick + control;
+  };
+
+  const formatFocusAT = (
+    technique: number | null,
+    control: number | null,
+    kick: number | null,
+  ) => {
+    if (technique == null || control == null || kick == null) return "-";
+    return Math.floor(technique + control + kick * 0.5);
+  };
+
+  const formatFocusDF = (
+    technique: number | null,
+    intelligence: number | null,
+    agility: number | null,
+  ) => {
+    if (technique == null || intelligence == null || agility == null)
+      return "-";
+    return Math.floor(technique + intelligence + agility * 0.5);
+  };
+
+  const formatScrambleAT = (
+    intelligence: number | null,
+    physical: number | null,
+  ) => {
+    if (intelligence == null || physical == null) return "-";
+    return intelligence + physical;
+  };
+
+  const formatScrambleDF = (
+    intelligence: number | null,
+    pressure: number | null,
+  ) => {
+    if (intelligence == null || pressure == null) return "-";
+    return intelligence + pressure;
+  };
+
+  const formatWallDF = (physical: number | null, pressure: number | null) => {
+    if (physical == null || pressure == null) return "-";
+    return physical + pressure;
+  };
+
+  const formatKP = (
+    agility: number | null,
+    physical: number | null,
+    pressure: number | null,
+  ) => {
+    if (agility == null || physical == null || pressure == null) return "-";
+    return agility * 4 + physical * 3 + pressure * 2;
+  };
+
+  const handleSearch = async () => {
+    if (isPending) return;
+
+    const query = inputRef.current?.value ?? "";
+    startTransition(async () => {
+      const result = await searchCharactersAction(query, 1);
+      setSearchResult(result);
+      console.log("searchCharactersAction result:", result);
+    });
+
     inputRef.current?.blur();
     setIsInputFocused(false);
     const active = document.activeElement;
     if (active instanceof HTMLElement) active.blur();
-    alert(`検索ワード: ${inputRef.current?.value}`);
   };
 
   return (
     <div>
-      <div className="mx-2 py-16">
-        <div className="container mx-auto rounded-4xl border">
-          <div className="flex justify-center">
-            <h2 className="bg-bar mx-4 my-8 flex w-7xl flex-col items-center justify-center bg-[repeating-linear-gradient(-45deg,transparent,transparent_6px,rgb(20,20,20)_6px,rgb(20,20,20)_12px)] px-2 py-16 text-center text-2xl leading-12 font-bold text-white">
-              <span>イナズマイレブン</span>
-              <span>英雄たちのヴィクトリーロード</span>
-              <span>非公式データベース</span>
-            </h2>
-          </div>
-          <div className="flex justify-center">
-            <div
-              className={`border-search-border mx-4 my-8 flex w-7xl rounded-4xl border shadow-[0_0_0_2px_var(--color-search-border-shadow)] ${
-                isInputFocused
-                  ? "shadow-[0_0_0_4px_var(--color-search-border-shadow-active)]"
-                  : ""
-              }`}
-            >
-              <input
-                type="text"
-                className="flex-1 rounded-4xl rounded-r-none p-4 outline-none"
-                placeholder="イナイレDBでキャラクター名またはニックネーム／よみがなを検索"
-                ref={inputRef}
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => setIsInputFocused(false)}
-                onCompositionStart={() => setIsComposing(true)}
-                onCompositionEnd={() => setIsComposing(false)}
-                onKeyDown={(e) => {
-                  // IME変換確定のEnterでは検索しない
-                  if (e.key !== "Enter") return;
-                  if (isComposing || e.nativeEvent.isComposing) return;
-                  handleSearch();
-                }}
-              />
-              <button
-                className="bg-search-button-background rounded-4xl rounded-l-none px-8 py-4 font-bold hover:cursor-pointer hover:brightness-95 active:brightness-90"
-                onClick={handleSearch}
-                type="button"
+      <div className="py-16">
+        <div className="mx-2">
+          <div className="container mx-auto rounded-4xl border">
+            <div className="flex justify-center">
+              <h2 className="bg-bar mx-4 my-8 flex w-7xl flex-col items-center justify-center bg-[repeating-linear-gradient(-45deg,transparent,transparent_6px,rgb(20,20,20)_6px,rgb(20,20,20)_12px)] px-2 py-16 text-center text-2xl leading-12 font-bold text-white">
+                <span>イナズマイレブン</span>
+                <span>英雄たちのヴィクトリーロード</span>
+                <span>非公式データベース</span>
+              </h2>
+            </div>
+            <div className="flex justify-center">
+              <div
+                className={`border-search-border mx-4 my-8 flex w-7xl rounded-4xl border ${
+                  isPending
+                    ? "shadow-[0_0_0_4px_var(--color-search-border-shadow-disabled)]"
+                    : isInputFocused
+                      ? "shadow-[0_0_0_4px_var(--color-search-border-shadow-active)]"
+                      : "shadow-[0_0_0_2px_var(--color-search-border-shadow)]"
+                }`}
               >
-                検索
-              </button>
+                <input
+                  type="text"
+                  className="flex-1 rounded-4xl rounded-r-none p-4 outline-none"
+                  placeholder="イナイレDBでキャラクター名またはニックネーム／よみがなを検索"
+                  ref={inputRef}
+                  disabled={isPending}
+                  onFocus={() => setIsInputFocused(true)}
+                  onBlur={() => setIsInputFocused(false)}
+                  onCompositionStart={() => setIsComposing(true)}
+                  onCompositionEnd={() => setIsComposing(false)}
+                  onKeyDown={(e) => {
+                    // IME変換確定のEnterでは検索しない
+                    if (e.key !== "Enter") return;
+                    if (isComposing || e.nativeEvent.isComposing) return;
+                    handleSearch();
+                  }}
+                />
+                <button
+                  className="bg-search-button-background rounded-4xl rounded-l-none px-8 py-4 font-bold hover:cursor-pointer hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:brightness-100"
+                  onClick={handleSearch}
+                  type="button"
+                  disabled={isPending}
+                >
+                  <span className="flex items-center gap-2">
+                    {isPending ? (
+                      <span
+                        className="border-search-border h-5 w-5 animate-spin rounded-full border-2 border-t-transparent"
+                        aria-label="読み込み中"
+                      />
+                    ) : null}
+                    <span>{isPending ? "検索中" : "検索"}</span>
+                  </span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+        {searchResult ? (
+          <div className="mt-8 overflow-x-auto">
+            <table className="mx-auto border-collapse text-center whitespace-nowrap">
+              <thead>
+                <tr className="*:border *:p-2">
+                  <th>No.</th>
+                  <th>名前</th>
+                  <th>ニックネーム</th>
+                  <th>キック</th>
+                  <th>コントロール</th>
+                  <th>テクニック</th>
+                  <th>プレッシャー</th>
+                  <th>フィジカル</th>
+                  <th>アジリティ</th>
+                  <th>インテリジェンス</th>
+                  <th>シュートAT</th>
+                  <th>フォーカスAT</th>
+                  <th>フォーカスDF</th>
+                  <th>スクランブルAT</th>
+                  <th>スクランブルDF</th>
+                  <th>城壁DF</th>
+                  <th>KP</th>
+                </tr>
+              </thead>
+              <tbody>
+                {searchResult.rows.map((row) => (
+                  <tr key={row.character_no} className="*:border *:p-2">
+                    <td>{row.character_no}</td>
+                    <td className="text-left">
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={row.image_url}
+                          alt={row.full_name.map((n) => n.name).join("")}
+                          width={48}
+                          height={48}
+                          sizes="48px"
+                          className="h-12 w-12 shrink-0"
+                        />
+                        <div className="flex flex-col">
+                          <div>{row.full_name.map((n) => n.name).join("")}</div>
+                          <div className="text-xs">
+                            {row.full_name.map((n) => n.ruby).join("")}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="text-left">
+                      <div className="flex flex-col">
+                        <div>{row.nickname.map((n) => n.name).join("")}</div>
+                        <div className="text-xs">
+                          {row.nickname.map((n) => n.ruby).join("")}
+                        </div>
+                      </div>
+                    </td>
+                    <td>{row.kick ?? "-"}</td>
+                    <td>{row.control ?? "-"}</td>
+                    <td>{row.technique ?? "-"}</td>
+                    <td>{row.pressure ?? "-"}</td>
+                    <td>{row.physical ?? "-"}</td>
+                    <td>{row.agility ?? "-"}</td>
+                    <td>{row.intelligence ?? "-"}</td>
+                    <td>{formatShootAT(row.kick, row.control)}</td>
+                    <td>
+                      {formatFocusAT(row.technique, row.control, row.kick)}
+                    </td>
+                    <td>
+                      {formatFocusDF(
+                        row.technique,
+                        row.intelligence,
+                        row.agility,
+                      )}
+                    </td>
+                    <td>{formatScrambleAT(row.intelligence, row.physical)}</td>
+                    <td>{formatScrambleDF(row.intelligence, row.pressure)}</td>
+                    <td>{formatWallDF(row.physical, row.pressure)}</td>
+                    <td>{formatKP(row.agility, row.physical, row.pressure)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
     </div>
   );
