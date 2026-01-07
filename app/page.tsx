@@ -73,6 +73,40 @@ export default function Home() {
     return agility * 4 + physical * 3 + pressure * 2;
   };
 
+  const formatStatusTotal = (row: {
+    kick: number | null;
+    control: number | null;
+    technique: number | null;
+    pressure: number | null;
+    physical: number | null;
+    agility: number | null;
+    intelligence: number | null;
+  }) => {
+    const {
+      kick,
+      control,
+      technique,
+      pressure,
+      physical,
+      agility,
+      intelligence,
+    } = row;
+    if (
+      kick == null ||
+      control == null ||
+      technique == null ||
+      pressure == null ||
+      physical == null ||
+      agility == null ||
+      intelligence == null
+    ) {
+      return "-";
+    }
+    return (
+      kick + control + technique + pressure + physical + agility + intelligence
+    );
+  };
+
   const handleSearch = async () => {
     if (isPending) return;
 
@@ -211,6 +245,7 @@ export default function Home() {
                   <th>フィジカル</th>
                   <th>アジリティ</th>
                   <th>インテリジェンス</th>
+                  <th>ステータス合計</th>
                   <th>シュートAT</th>
                   <th>フォーカスAT</th>
                   <th>フォーカスDF</th>
@@ -260,6 +295,17 @@ export default function Home() {
                     <td>{row.physical ?? "-"}</td>
                     <td>{row.agility ?? "-"}</td>
                     <td>{row.intelligence ?? "-"}</td>
+                    <td>
+                      {formatStatusTotal({
+                        kick: row.kick,
+                        control: row.control,
+                        technique: row.technique,
+                        pressure: row.pressure,
+                        physical: row.physical,
+                        agility: row.agility,
+                        intelligence: row.intelligence,
+                      })}
+                    </td>
                     <td>{formatShootAT(row.kick, row.control)}</td>
                     <td>
                       {formatFocusAT(row.technique, row.control, row.kick)}
