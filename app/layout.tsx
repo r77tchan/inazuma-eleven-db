@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   title: "イナイレDB",
   description:
     "イナズマイレブン\n英雄たちのヴィクトリーロード\n非公式データベース",
+  verification: {
+    google: "7gOey4QjGF6VUX6M6Cf5cyhYhaoHVIOcQTHNj0IS1xQ",
+  },
 };
 
 export default function RootLayout({
