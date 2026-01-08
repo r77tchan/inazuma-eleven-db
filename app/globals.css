@@ -13,6 +13,8 @@
   --tab-bg-selected: #dddddd;
   --tab-bg: #cccccc;
   --tab-bg-aqua: #73a2c780;
+  --tab-border: #ff8aca95;
+  --tab-button: #ff8aca20;
 }
 
 @theme inline {
@@ -28,6 +30,8 @@
   --color-tab-bg-selected: var(--tab-bg-selected);
   --color-tab-bg: var(--tab-bg);
   --color-tab-bg-aqua: var(--tab-bg-aqua);
+  --color-tab-border: var(--tab-border);
+  --color-tab-button: var(--tab-button);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -41,6 +45,7 @@
     --search-bg: #111111;
     --tab-bg-selected: #222222;
     --tab-bg: #333333;
+    --tab-border: #ff8aca40;
   }
 }
 

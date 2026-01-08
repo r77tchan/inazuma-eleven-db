@@ -13,6 +13,9 @@ export default function Home() {
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
   const dragStartScrollLeftRef = useRef(0);
+  const [selectedTab, setSelectedTab] = useState<"history" | "options">(
+    "history",
+  );
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [searchResult, setSearchResult] =
@@ -223,21 +226,48 @@ export default function Home() {
             </div>
             <div className="mx-2 pb-8 sm:mx-4">
               <div className="flex">
-                <div className="bg-background border-search-button-background cursor-pointer border border-b-0 p-2">
+                <div
+                  className={`border-tab-border border p-2 font-bold hover:cursor-pointer ${
+                    selectedTab === "history"
+                      ? "bg-background border-b-0 hover:brightness-95 active:brightness-90"
+                      : "bg-tab-button hover:brightness-85 active:brightness-80"
+                  }`}
+                  onClick={() => setSelectedTab("history")}
+                >
                   更新履歴
                 </div>
-                <div className="bg-background border-search-button-background cursor-pointer border border-b-0 border-l-0 p-2">
+                <div
+                  className={`border-tab-border border border-l-0 p-2 font-bold hover:cursor-pointer ${
+                    selectedTab === "options"
+                      ? "bg-background border-b-0 hover:brightness-95 active:brightness-90"
+                      : "bg-tab-button hover:brightness-85 active:brightness-80"
+                  }`}
+                  onClick={() => setSelectedTab("options")}
+                >
                   検索オプション
                 </div>
-                <div className="border-search-button-background flex-1 border-b"></div>
+                <div className="border-tab-border flex-1 border-b"></div>
               </div>
-              <div className="border-search-button-background bg-background border border-t-0 p-2">
-                <ul>
-                  <li>aaa</li>
-                  <li>aaa</li>
-                  <li>aaa</li>
-                  <li>aaa</li>
-                </ul>
+              <div className="border-tab-border bg-background border border-t-0 p-2">
+                {selectedTab === "history" && (
+                  <div>
+                    <ul>
+                      <li>aaa</li>
+                      <li>aaa</li>
+                      <li>aaa</li>
+                      <li>aaa</li>
+                    </ul>
+                  </div>
+                )}
+                {selectedTab === "options" && (
+                  <div>
+                    <p>表示列</p>
+                    <label>
+                      <input type="checkbox" name="gender" />
+                      性別
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -257,6 +287,9 @@ export default function Home() {
                   <th>No.</th>
                   <th>名前</th>
                   <th>ニックネーム</th>
+                  <th>性別</th>
+                  <th>属性</th>
+                  <th>ポジション</th>
                   <th>キック</th>
                   <th>コントロール</th>
                   <th>テクニック</th>
@@ -307,6 +340,9 @@ export default function Home() {
                         </div>
                       </div>
                     </td>
+                    <td>{row.gender}</td>
+                    <td>{row.element}</td>
+                    <td>{row.position}</td>
                     <td>{row.kick ?? "-"}</td>
                     <td>{row.control ?? "-"}</td>
                     <td>{row.technique ?? "-"}</td>
