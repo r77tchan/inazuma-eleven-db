@@ -16,11 +16,47 @@ export default function Home() {
   const [selectedTab, setSelectedTab] = useState<"history" | "options">(
     "history",
   );
+  const [viewTableColumn, setViewTableColumn] = useState<{
+    [key: string]: boolean;
+  }>({
+    remove: false,
+    gender: false,
+    element: false,
+    position: false,
+    kick: false,
+    control: false,
+    technique: false,
+    pressure: false,
+    physical: false,
+    agility: false,
+    intelligence: false,
+    totalStatus: true,
+    shootAT: true,
+    focusAT: true,
+    focusDF: true,
+    scrambleAT: true,
+    scrambleDF: true,
+    wallDF: true,
+    KP: true,
+  });
+  const [searchResultMode, setSearchResultMode] = useState<
+    "overwrite" | "append"
+  >("overwrite");
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [searchResult, setSearchResult] =
     useState<SearchCharactersResponse | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  const changeViewTableColumn = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setViewTableColumn((prev) => {
+      return {
+        ...prev,
+        [name]: checked,
+      };
+    });
+  };
 
   const formatShootAT = (kick: number | null, control: number | null) => {
     if (kick == null || control == null) return "-";
@@ -116,7 +152,30 @@ export default function Home() {
     const query = inputRef.current?.value ?? "";
     startTransition(async () => {
       const result = await searchCharactersAction(query, 1);
-      setSearchResult(result);
+      if (searchResultMode === "overwrite") {
+        setSearchResult(result);
+      } else if (searchResultMode === "append") {
+        setSearchResult((prev) => {
+          if (!prev) return result;
+          const existingNos = new Set(
+            prev.rows
+              .map((r) => r.character_no)
+              .filter((n): n is number => n != null),
+          );
+
+          const dedupedNextRows = result.rows.filter((r) => {
+            const no = r.character_no;
+            if (no == null) return true;
+            if (existingNos.has(no)) return false;
+            existingNos.add(no);
+            return true;
+          });
+          return {
+            ...result,
+            rows: [...prev.rows, ...dedupedNextRows],
+          };
+        });
+      }
       console.log("searchCharactersAction result:", result);
     });
 
@@ -124,12 +183,18 @@ export default function Home() {
     setIsInputFocused(false);
     const active = document.activeElement;
     if (active instanceof HTMLElement) active.blur();
+
+    inputRef.current!.value = "";
   };
 
   const onTablePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // タッチはブラウザ標準スクロールに任せる
     if (e.pointerType !== "mouse") return;
     if (e.button !== 0) return;
+
+    // ボタン等の操作要素上ではドラッグ開始しない（クリックを優先）
+    const target = e.target as HTMLElement | null;
+    if (target?.closest("button, a, input, select, textarea, label")) return;
 
     const el = tableScrollRef.current;
     if (!el) return;
@@ -244,7 +309,7 @@ export default function Home() {
                   }`}
                   onClick={() => setSelectedTab("options")}
                 >
-                  検索オプション
+                  オプション
                 </div>
                 <div className="border-tab-border flex-1 border-b"></div>
               </div>
@@ -252,7 +317,7 @@ export default function Home() {
                 {selectedTab === "history" && (
                   <div>
                     <ul>
-                      <li>aaa</li>
+                      <li>準備中</li>
                       <li>aaa</li>
                       <li>aaa</li>
                       <li>aaa</li>
@@ -260,13 +325,209 @@ export default function Home() {
                   </div>
                 )}
                 {selectedTab === "options" && (
-                  <div>
-                    <p>表示列</p>
-                    <label>
-                      <input type="checkbox" name="gender" />
-                      性別
-                    </label>
-                  </div>
+                  <>
+                    <div>
+                      <p>表示する列</p>
+                      <div className="p-2 *:inline-block *:p-2">
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="remove"
+                            checked={viewTableColumn["remove"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          除外ボタン
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="gender"
+                            checked={viewTableColumn["gender"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          性別
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="element"
+                            checked={viewTableColumn["element"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          属性
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="position"
+                            checked={viewTableColumn["position"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          ポジション
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="kick"
+                            checked={viewTableColumn["kick"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          キック
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="control"
+                            checked={viewTableColumn["control"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          コントロール
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="technique"
+                            checked={viewTableColumn["technique"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          テクニック
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="pressure"
+                            checked={viewTableColumn["pressure"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          プレッシャー
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="physical"
+                            checked={viewTableColumn["physical"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          フィジカル
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="agility"
+                            checked={viewTableColumn["agility"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          アジリティ
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="intelligence"
+                            checked={viewTableColumn["intelligence"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          インテリジェンス
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="totalStatus"
+                            checked={viewTableColumn["totalStatus"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          ステータス合計
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="shootAT"
+                            checked={viewTableColumn["shootAT"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          シュートAT
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="focusAT"
+                            checked={viewTableColumn["focusAT"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          フォーカスAT
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="focusDF"
+                            checked={viewTableColumn["focusDF"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          フォーカスDF
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="scrambleAT"
+                            checked={viewTableColumn["scrambleAT"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          スクランブルAT
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="scrambleDF"
+                            checked={viewTableColumn["scrambleDF"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          スクランブルDF
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="wallDF"
+                            checked={viewTableColumn["wallDF"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          城壁DF
+                        </label>
+                        <label>
+                          <input
+                            type="checkbox"
+                            name="KP"
+                            checked={viewTableColumn["KP"]}
+                            onChange={changeViewTableColumn}
+                          />
+                          KP
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <p>検索結果をテーブルに</p>
+                      <div className="p-2 *:inline-block *:p-2">
+                        <label>
+                          <input
+                            type="radio"
+                            name="search-result-mode"
+                            value="overwrite"
+                            checked={searchResultMode === "overwrite"}
+                            onChange={() => setSearchResultMode("overwrite")}
+                          />
+                          上書き
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="search-result-mode"
+                            value="append"
+                            checked={searchResultMode === "append"}
+                            onChange={() => setSearchResultMode("append")}
+                          />
+                          追加
+                        </label>
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             </div>
@@ -284,27 +545,28 @@ export default function Home() {
             <table className="mx-auto border-collapse border text-center whitespace-nowrap">
               <thead>
                 <tr className="*:border *:p-2">
+                  {viewTableColumn["remove"] && <th>除外</th>}
                   <th>No.</th>
                   <th>名前</th>
                   <th>ニックネーム</th>
-                  <th>性別</th>
-                  <th>属性</th>
-                  <th>ポジション</th>
-                  <th>キック</th>
-                  <th>コントロール</th>
-                  <th>テクニック</th>
-                  <th>プレッシャー</th>
-                  <th>フィジカル</th>
-                  <th>アジリティ</th>
-                  <th>インテリジェンス</th>
-                  <th>ステータス合計</th>
-                  <th>シュートAT</th>
-                  <th>フォーカスAT</th>
-                  <th>フォーカスDF</th>
-                  <th>スクランブルAT</th>
-                  <th>スクランブルDF</th>
-                  <th>城壁DF</th>
-                  <th>KP</th>
+                  {viewTableColumn["gender"] && <th>性別</th>}
+                  {viewTableColumn["element"] && <th>属性</th>}
+                  {viewTableColumn["position"] && <th>ポジション</th>}
+                  {viewTableColumn["kick"] && <th>キック</th>}
+                  {viewTableColumn["control"] && <th>コントロール</th>}
+                  {viewTableColumn["technique"] && <th>テクニック</th>}
+                  {viewTableColumn["pressure"] && <th>プレッシャー</th>}
+                  {viewTableColumn["physical"] && <th>フィジカル</th>}
+                  {viewTableColumn["agility"] && <th>アジリティ</th>}
+                  {viewTableColumn["intelligence"] && <th>インテリジェンス</th>}
+                  {viewTableColumn["totalStatus"] && <th>ステータス合計</th>}
+                  {viewTableColumn["shootAT"] && <th>シュートAT</th>}
+                  {viewTableColumn["focusAT"] && <th>フォーカスAT</th>}
+                  {viewTableColumn["focusDF"] && <th>フォーカスDF</th>}
+                  {viewTableColumn["scrambleAT"] && <th>スクランブルAT</th>}
+                  {viewTableColumn["scrambleDF"] && <th>スクランブルDF</th>}
+                  {viewTableColumn["wallDF"] && <th>城壁DF</th>}
+                  {viewTableColumn["KP"] && <th>KP</th>}
                 </tr>
               </thead>
               <tbody>
@@ -313,6 +575,28 @@ export default function Home() {
                     key={row.character_no}
                     className="hover:bg-search-border-shadow *:border *:p-2"
                   >
+                    {viewTableColumn["remove"] && (
+                      <td>
+                        <button
+                          className="grid h-7 w-7 place-items-center bg-red-500 font-bold text-white hover:cursor-pointer hover:brightness-95 active:brightness-90"
+                          onClick={() => {
+                            setSearchResult((prev) => {
+                              if (!prev) return null;
+                              return {
+                                ...prev,
+                                rows: prev.rows.filter(
+                                  (r) => r.character_no !== row.character_no,
+                                ),
+                              };
+                            });
+                          }}
+                          aria-label="除外"
+                          title="除外"
+                        >
+                          ×
+                        </button>
+                      </td>
+                    )}
                     <td>{row.character_no}</td>
                     <td className="text-left">
                       <div className="inline-flex w-max items-center gap-3 whitespace-nowrap">
@@ -340,42 +624,76 @@ export default function Home() {
                         </div>
                       </div>
                     </td>
-                    <td>{row.gender}</td>
-                    <td>{row.element}</td>
-                    <td>{row.position}</td>
-                    <td>{row.kick ?? "-"}</td>
-                    <td>{row.control ?? "-"}</td>
-                    <td>{row.technique ?? "-"}</td>
-                    <td>{row.pressure ?? "-"}</td>
-                    <td>{row.physical ?? "-"}</td>
-                    <td>{row.agility ?? "-"}</td>
-                    <td>{row.intelligence ?? "-"}</td>
-                    <td>
-                      {formatStatusTotal({
-                        kick: row.kick,
-                        control: row.control,
-                        technique: row.technique,
-                        pressure: row.pressure,
-                        physical: row.physical,
-                        agility: row.agility,
-                        intelligence: row.intelligence,
-                      })}
-                    </td>
-                    <td>{formatShootAT(row.kick, row.control)}</td>
-                    <td>
-                      {formatFocusAT(row.technique, row.control, row.kick)}
-                    </td>
-                    <td>
-                      {formatFocusDF(
-                        row.technique,
-                        row.intelligence,
-                        row.agility,
-                      )}
-                    </td>
-                    <td>{formatScrambleAT(row.intelligence, row.physical)}</td>
-                    <td>{formatScrambleDF(row.intelligence, row.pressure)}</td>
-                    <td>{formatWallDF(row.physical, row.pressure)}</td>
-                    <td>{formatKP(row.agility, row.physical, row.pressure)}</td>
+                    {viewTableColumn["gender"] && <td>{row.gender}</td>}
+                    {viewTableColumn["element"] && <td>{row.element}</td>}
+                    {viewTableColumn["position"] && <td>{row.position}</td>}
+                    {viewTableColumn["kick"] && <td>{row.kick ?? "-"}</td>}
+                    {viewTableColumn["control"] && (
+                      <td>{row.control ?? "-"}</td>
+                    )}
+                    {viewTableColumn["technique"] && (
+                      <td>{row.technique ?? "-"}</td>
+                    )}
+                    {viewTableColumn["pressure"] && (
+                      <td>{row.pressure ?? "-"}</td>
+                    )}
+                    {viewTableColumn["physical"] && (
+                      <td>{row.physical ?? "-"}</td>
+                    )}
+                    {viewTableColumn["agility"] && (
+                      <td>{row.agility ?? "-"}</td>
+                    )}
+                    {viewTableColumn["intelligence"] && (
+                      <td>{row.intelligence ?? "-"}</td>
+                    )}
+                    {viewTableColumn["totalStatus"] && (
+                      <td>
+                        {formatStatusTotal({
+                          kick: row.kick,
+                          control: row.control,
+                          technique: row.technique,
+                          pressure: row.pressure,
+                          physical: row.physical,
+                          agility: row.agility,
+                          intelligence: row.intelligence,
+                        })}
+                      </td>
+                    )}
+                    {viewTableColumn["shootAT"] && (
+                      <td>{formatShootAT(row.kick, row.control)}</td>
+                    )}
+                    {viewTableColumn["focusAT"] && (
+                      <td>
+                        {formatFocusAT(row.technique, row.control, row.kick)}
+                      </td>
+                    )}
+                    {viewTableColumn["focusDF"] && (
+                      <td>
+                        {formatFocusDF(
+                          row.technique,
+                          row.intelligence,
+                          row.agility,
+                        )}
+                      </td>
+                    )}
+                    {viewTableColumn["scrambleAT"] && (
+                      <td>
+                        {formatScrambleAT(row.intelligence, row.physical)}
+                      </td>
+                    )}
+                    {viewTableColumn["scrambleDF"] && (
+                      <td>
+                        {formatScrambleDF(row.intelligence, row.pressure)}
+                      </td>
+                    )}
+                    {viewTableColumn["wallDF"] && (
+                      <td>{formatWallDF(row.physical, row.pressure)}</td>
+                    )}
+                    {viewTableColumn["KP"] && (
+                      <td>
+                        {formatKP(row.agility, row.physical, row.pressure)}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
