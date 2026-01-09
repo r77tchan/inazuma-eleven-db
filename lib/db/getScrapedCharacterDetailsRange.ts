@@ -9,15 +9,15 @@ export async function getScrapedCharacterDetailsRange(
 ): Promise<ScrapedCharacterDetailRow[]> {
   // console.log("db接続");
 
-  const safeOffset = Number.isFinite(offset)
-    ? Math.max(0, Math.trunc(offset))
+  const safeOffset = Number.isFinite(offset) // NaN、Infinity、文字列はfalseになる
+    ? Math.max(0, Math.trunc(offset)) // 小数点以下を切り捨て、負の値は0に
     : 0;
   const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.trunc(limit)) : 1;
 
   const query = supabaseAdmin
     .from("scraped_character_details")
     .select("*")
-    .order("character_no", { ascending: true })
+    .order("character_no", { ascending: true }) // 昇順
     .range(safeOffset, safeOffset + safeLimit - 1);
 
   const { data, error } = await query;

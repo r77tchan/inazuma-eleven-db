@@ -8,7 +8,7 @@ import type { SearchCharactersResponse } from "@/app/actions/searchCharacters";
 import Image from "next/image";
 
 export default function Home() {
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const characterNameSearchInputRef = useRef<HTMLInputElement | null>(null);
   const tableScrollRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
@@ -42,6 +42,7 @@ export default function Home() {
   const [searchResultMode, setSearchResultMode] = useState<
     "overwrite" | "append"
   >("overwrite");
+  const [maxLimit, setMaxLimit] = useState<"50" | "200" | "unlimited">("50");
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
   const [searchResult, setSearchResult] =
@@ -149,9 +150,13 @@ export default function Home() {
   const handleSearch = async () => {
     if (isPending) return;
 
-    const query = inputRef.current?.value ?? "";
+    const characterNameSearchInputRefQuery =
+      characterNameSearchInputRef.current?.value ?? "";
     startTransition(async () => {
-      const result = await searchCharactersAction(query, 1);
+      const result = await searchCharactersAction(
+        characterNameSearchInputRefQuery,
+        maxLimit === "unlimited" ? undefined : Number(maxLimit),
+      );
       if (searchResultMode === "overwrite") {
         setSearchResult(result);
       } else if (searchResultMode === "append") {
@@ -179,12 +184,12 @@ export default function Home() {
       console.log("searchCharactersAction result:", result);
     });
 
-    inputRef.current?.blur();
+    characterNameSearchInputRef.current?.blur();
     setIsInputFocused(false);
     const active = document.activeElement;
     if (active instanceof HTMLElement) active.blur();
 
-    inputRef.current!.value = "";
+    characterNameSearchInputRef.current!.value = "";
   };
 
   const onTablePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -258,7 +263,7 @@ export default function Home() {
                   type="text"
                   className="bg-background flex-1 rounded-4xl rounded-r-none p-4 outline-none"
                   placeholder="イナイレDBでキャラクター名またはニックネーム／よみがなを検索"
-                  ref={inputRef}
+                  ref={characterNameSearchInputRef}
                   disabled={isPending}
                   onFocus={() => setIsInputFocused(true)}
                   onBlur={() => setIsInputFocused(false)}
@@ -326,6 +331,66 @@ export default function Home() {
                 )}
                 {selectedTab === "options" && (
                   <>
+                    <div>
+                      <p>最大取得数</p>
+                      <div className="p-2 *:inline-block *:p-2">
+                        <label>
+                          <input
+                            type="radio"
+                            name="max-limit"
+                            value="50"
+                            checked={maxLimit === "50"}
+                            onChange={() => setMaxLimit("50")}
+                          />
+                          50件
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="max-limit"
+                            value="200"
+                            checked={maxLimit === "200"}
+                            onChange={() => setMaxLimit("200")}
+                          />
+                          200件
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="max-limit"
+                            value="unlimited"
+                            checked={maxLimit === "unlimited"}
+                            onChange={() => setMaxLimit("unlimited")}
+                          />
+                          無制限
+                        </label>
+                      </div>
+                    </div>
+                    <div>
+                      <p>検索結果をテーブルに</p>
+                      <div className="p-2 *:inline-block *:p-2">
+                        <label>
+                          <input
+                            type="radio"
+                            name="search-result-mode"
+                            value="overwrite"
+                            checked={searchResultMode === "overwrite"}
+                            onChange={() => setSearchResultMode("overwrite")}
+                          />
+                          上書き
+                        </label>
+                        <label>
+                          <input
+                            type="radio"
+                            name="search-result-mode"
+                            value="append"
+                            checked={searchResultMode === "append"}
+                            onChange={() => setSearchResultMode("append")}
+                          />
+                          追加
+                        </label>
+                      </div>
+                    </div>
                     <div>
                       <p>表示する列</p>
                       <div className="p-2 *:inline-block *:p-2">
@@ -499,31 +564,6 @@ export default function Home() {
                             onChange={changeViewTableColumn}
                           />
                           KP
-                        </label>
-                      </div>
-                    </div>
-                    <div>
-                      <p>検索結果をテーブルに</p>
-                      <div className="p-2 *:inline-block *:p-2">
-                        <label>
-                          <input
-                            type="radio"
-                            name="search-result-mode"
-                            value="overwrite"
-                            checked={searchResultMode === "overwrite"}
-                            onChange={() => setSearchResultMode("overwrite")}
-                          />
-                          上書き
-                        </label>
-                        <label>
-                          <input
-                            type="radio"
-                            name="search-result-mode"
-                            value="append"
-                            checked={searchResultMode === "append"}
-                            onChange={() => setSearchResultMode("append")}
-                          />
-                          追加
                         </label>
                       </div>
                     </div>
