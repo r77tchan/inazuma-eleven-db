@@ -16,6 +16,7 @@
   --tab-border: #ff8aca95;
   --tab-button: #ff8aca20;
   --scroll-bar-thumb: #ff3939;
+  --tab-exe-button: #e5efff;
 }
 
 @theme inline {
@@ -34,6 +35,7 @@
   --color-tab-border: var(--tab-border);
   --color-tab-button: var(--tab-button);
   --color-scroll-bar-thumb: var(--scroll-bar-thumb);
+  --color-tab-exe-button: var(--tab-exe-button);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -48,6 +50,7 @@
     --tab-bg-selected: #222222;
     --tab-bg: #333333;
     --tab-border: #ff8aca40;
+    --tab-exe-button: #90baff50;
   }
 }
 

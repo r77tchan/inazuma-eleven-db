@@ -1,3 +1,7 @@
+import { useState } from "react";
+
+import type { MetricKey } from "@/lib/characterMetrics";
+
 export default function TabPart({
   selectedTab,
   setSelectedTab,
@@ -7,6 +11,8 @@ export default function TabPart({
   setSearchResultMode,
   viewTableColumn,
   changeViewTableColumn,
+  canSort,
+  handleSort,
 }: {
   selectedTab: "history" | "options";
   setSelectedTab: (tab: "history" | "options") => void;
@@ -16,7 +22,11 @@ export default function TabPart({
   setSearchResultMode: (mode: "overwrite" | "append") => void;
   viewTableColumn: { [key: string]: boolean };
   changeViewTableColumn: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  canSort: boolean;
+  handleSort: (key: MetricKey) => void;
 }) {
+  const [sortKey, setSortKey] = useState<MetricKey>("totalStatus");
+
   return (
     <div className="mx-2 pb-8 sm:mx-4">
       <div className="flex">
@@ -289,6 +299,33 @@ export default function TabPart({
                   />
                   KP
                 </label>
+              </div>
+            </div>
+            <div>
+              <p>並べ替え</p>
+              <div className="flex flex-wrap gap-2 p-2">
+                <select
+                  className="border p-2"
+                  value={sortKey}
+                  onChange={(e) => setSortKey(e.target.value as MetricKey)}
+                >
+                  <option value="totalStatus">ステータス合計</option>
+                  <option value="shootAT">シュートAT</option>
+                  <option value="focusAT">フォーカスAT</option>
+                  <option value="focusDF">フォーカスDF</option>
+                  <option value="scrambleAT">スクランブルAT</option>
+                  <option value="scrambleDF">スクランブルDF</option>
+                  <option value="wallDF">城壁DF</option>
+                  <option value="KP">KP</option>
+                </select>
+                <button
+                  className="bg-tab-exe-button rounded border p-2 hover:cursor-pointer hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:brightness-100"
+                  type="button"
+                  disabled={!canSort}
+                  onClick={() => handleSort(sortKey)}
+                >
+                  実行
+                </button>
               </div>
             </div>
           </>

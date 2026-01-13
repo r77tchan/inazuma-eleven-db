@@ -1,4 +1,6 @@
 import type { SearchCharactersResponse } from "@/app/actions/searchCharacters";
+import type { MetricKey } from "@/lib/characterMetrics";
+import { getMetricValue } from "@/lib/characterMetrics";
 import Image from "next/image";
 import React, { useRef } from "react";
 
@@ -65,92 +67,12 @@ export default function TablePart({
     }
   };
 
-  const formatShootAT = (kick: number | null, control: number | null) => {
-    if (kick == null || control == null) return "-";
-    return kick + control;
-  };
-
-  const formatFocusAT = (
-    technique: number | null,
-    control: number | null,
-    kick: number | null,
+  const formatMetric = (
+    row: Parameters<typeof getMetricValue>[0],
+    key: MetricKey,
   ) => {
-    if (technique == null || control == null || kick == null) return "-";
-    return Math.floor(technique + control + kick * 0.5);
-  };
-
-  const formatFocusDF = (
-    technique: number | null,
-    intelligence: number | null,
-    agility: number | null,
-  ) => {
-    if (technique == null || intelligence == null || agility == null)
-      return "-";
-    return Math.floor(technique + intelligence + agility * 0.5);
-  };
-
-  const formatScrambleAT = (
-    intelligence: number | null,
-    physical: number | null,
-  ) => {
-    if (intelligence == null || physical == null) return "-";
-    return intelligence + physical;
-  };
-
-  const formatScrambleDF = (
-    intelligence: number | null,
-    pressure: number | null,
-  ) => {
-    if (intelligence == null || pressure == null) return "-";
-    return intelligence + pressure;
-  };
-
-  const formatWallDF = (physical: number | null, pressure: number | null) => {
-    if (physical == null || pressure == null) return "-";
-    return physical + pressure;
-  };
-
-  const formatKP = (
-    agility: number | null,
-    physical: number | null,
-    pressure: number | null,
-  ) => {
-    if (agility == null || physical == null || pressure == null) return "-";
-    return agility * 4 + physical * 3 + pressure * 2;
-  };
-
-  const formatStatusTotal = (row: {
-    kick: number | null;
-    control: number | null;
-    technique: number | null;
-    pressure: number | null;
-    physical: number | null;
-    agility: number | null;
-    intelligence: number | null;
-  }) => {
-    const {
-      kick,
-      control,
-      technique,
-      pressure,
-      physical,
-      agility,
-      intelligence,
-    } = row;
-    if (
-      kick == null ||
-      control == null ||
-      technique == null ||
-      pressure == null ||
-      physical == null ||
-      agility == null ||
-      intelligence == null
-    ) {
-      return "-";
-    }
-    return (
-      kick + control + technique + pressure + physical + agility + intelligence
-    );
+    const v = getMetricValue(row, key);
+    return v == null ? "-" : v;
   };
 
   return searchResult ? (
@@ -260,45 +182,27 @@ export default function TablePart({
                   <td>{row.intelligence ?? "-"}</td>
                 )}
                 {viewTableColumn["totalStatus"] && (
-                  <td>
-                    {formatStatusTotal({
-                      kick: row.kick,
-                      control: row.control,
-                      technique: row.technique,
-                      pressure: row.pressure,
-                      physical: row.physical,
-                      agility: row.agility,
-                      intelligence: row.intelligence,
-                    })}
-                  </td>
+                  <td>{formatMetric(row, "totalStatus")}</td>
                 )}
                 {viewTableColumn["shootAT"] && (
-                  <td>{formatShootAT(row.kick, row.control)}</td>
+                  <td>{formatMetric(row, "shootAT")}</td>
                 )}
                 {viewTableColumn["focusAT"] && (
-                  <td>{formatFocusAT(row.technique, row.control, row.kick)}</td>
+                  <td>{formatMetric(row, "focusAT")}</td>
                 )}
                 {viewTableColumn["focusDF"] && (
-                  <td>
-                    {formatFocusDF(
-                      row.technique,
-                      row.intelligence,
-                      row.agility,
-                    )}
-                  </td>
+                  <td>{formatMetric(row, "focusDF")}</td>
                 )}
                 {viewTableColumn["scrambleAT"] && (
-                  <td>{formatScrambleAT(row.intelligence, row.physical)}</td>
+                  <td>{formatMetric(row, "scrambleAT")}</td>
                 )}
                 {viewTableColumn["scrambleDF"] && (
-                  <td>{formatScrambleDF(row.intelligence, row.pressure)}</td>
+                  <td>{formatMetric(row, "scrambleDF")}</td>
                 )}
                 {viewTableColumn["wallDF"] && (
-                  <td>{formatWallDF(row.physical, row.pressure)}</td>
+                  <td>{formatMetric(row, "wallDF")}</td>
                 )}
-                {viewTableColumn["KP"] && (
-                  <td>{formatKP(row.agility, row.physical, row.pressure)}</td>
-                )}
+                {viewTableColumn["KP"] && <td>{formatMetric(row, "KP")}</td>}
               </tr>
             ))}
           </tbody>

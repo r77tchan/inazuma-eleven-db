@@ -4,6 +4,8 @@ import { useRef, useState, useTransition } from "react";
 
 import { searchCharactersAction } from "@/app/actions/searchCharacters";
 import type { SearchCharactersResponse } from "@/app/actions/searchCharacters";
+import type { MetricKey } from "@/lib/characterMetrics";
+import { sortRowsByMetric } from "@/lib/characterMetrics";
 import SearchPart from "./components/SearchPart";
 import TabPart from "./components/TabPart";
 import TablePart from "./components/TablePart";
@@ -104,6 +106,16 @@ export default function Home() {
     characterNameSearchInputRef.current!.value = "";
   };
 
+  const handleSort = (key: MetricKey) => {
+    setSearchResult((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        rows: sortRowsByMetric(prev.rows, key),
+      };
+    });
+  };
+
   return (
     <div>
       <div className="py-16">
@@ -134,6 +146,8 @@ export default function Home() {
               setSearchResultMode={setSearchResultMode}
               viewTableColumn={viewTableColumn}
               changeViewTableColumn={changeViewTableColumn}
+              canSort={!!searchResult?.rows?.length}
+              handleSort={handleSort}
             />
           </div>
         </div>
