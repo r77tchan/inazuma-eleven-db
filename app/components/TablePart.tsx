@@ -2,19 +2,21 @@ import type { SearchCharactersResponse } from "@/app/actions/searchCharacters";
 import type { MetricKey } from "@/lib/characterMetrics";
 import { getMetricValue } from "@/lib/characterMetrics";
 import Image from "next/image";
-import React, { useRef } from "react";
+import React, { memo, useRef } from "react";
 
-export default function TablePart({
-  searchResult,
-  viewTableColumn,
-  setSearchResult,
-}: {
+type TablePartProps = {
   searchResult: SearchCharactersResponse | null;
   viewTableColumn: { [key: string]: boolean };
   setSearchResult: React.Dispatch<
     React.SetStateAction<SearchCharactersResponse | null>
   >;
-}) {
+};
+
+const TablePart = memo(function TablePart({
+  searchResult,
+  viewTableColumn,
+  setSearchResult,
+}: TablePartProps) {
   const tableScrollRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
@@ -210,4 +212,8 @@ export default function TablePart({
       </div>
     </div>
   ) : null;
-}
+});
+
+TablePart.displayName = "TablePart";
+
+export default TablePart;
