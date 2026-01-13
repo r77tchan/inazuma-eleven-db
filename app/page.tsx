@@ -42,7 +42,7 @@ export default function Home() {
   >("overwrite");
   const [maxLimit, setMaxLimit] = useState<"50" | "200" | "unlimited">("50");
   const [isInputFocused, setIsInputFocused] = useState(false);
-  const [isComposing, setIsComposing] = useState(false);
+  const [isComposing, setIsComposing] = useState(false); // 日本語変換中フラグ
   const [searchResult, setSearchResult] =
     useState<SearchCharactersResponse | null>(null);
   const [isPending, startTransition] = useTransition(); //startTransition(fn)内で行うsetStateは低優先度の更新となり、UIの即時応答を阻害しない
@@ -72,12 +72,13 @@ export default function Home() {
       } else if (searchResultMode === "append") {
         setSearchResult((prev) => {
           if (!prev) return result;
+          // 既存のcharacter_noのセット型作成
           const existingNos = new Set(
             prev.rows
               .map((r) => r.character_no)
               .filter((n): n is number => n != null),
           );
-
+          // 重複していない新規データに絞る
           const dedupedNextRows = result.rows.filter((r) => {
             const no = r.character_no;
             if (no == null) return true;
@@ -85,6 +86,7 @@ export default function Home() {
             existingNos.add(no);
             return true;
           });
+          // 結合
           return {
             ...result,
             rows: [...prev.rows, ...dedupedNextRows],
