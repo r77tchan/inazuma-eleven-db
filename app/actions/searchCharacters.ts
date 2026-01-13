@@ -5,7 +5,6 @@ import { unstable_cache } from "next/cache";
 import { getScrapedCharacterDetailsRange } from "@/lib/db/getScrapedCharacterDetailsRange";
 import type { ScrapedCharacterDetailRow } from "@/lib/types";
 
-const PAGE_SIZE = 50;
 const CACHE_CHUNK_SIZE = 300;
 
 // 全角と半角スペースの削除
@@ -63,13 +62,11 @@ async function getAllCharactersCached(): Promise<ScrapedCharacterDetailRow[]> {
 export type SearchCharactersResponse = {
   rows: ScrapedCharacterDetailRow[];
   totalCount: number;
-  totalPages: number;
-  page: number;
 };
 
 export async function searchCharactersAction(
   characterNameSearchQuery: string,
-  page: number = 1,
+  maxLimit: number | undefined,
 ): Promise<SearchCharactersResponse> {
   const normalizedQuery = removeSpaces(characterNameSearchQuery);
   const allRows = await getAllCharactersCached();
@@ -91,22 +88,18 @@ export async function searchCharactersAction(
       })
     : allRows;
 
-  // 戻り値用のページング計算
   const totalCount = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(totalCount / PAGE_SIZE));
-  const safePage = Number.isFinite(page)
-    ? Math.min(Math.max(1, Math.trunc(page)), totalPages)
-    : 1;
 
-  const start = (safePage - 1) * PAGE_SIZE;
-  const rows = filtered.slice(start, start + PAGE_SIZE); // ページに対応する分だけ切り出す
+  const safeMaxLimit = maxLimit
+    ? Math.max(1, Math.trunc(maxLimit))
+    : totalCount;
+
+  const rows = filtered.slice(0, safeMaxLimit); // 最大取得件数に対応する分だけ切り出す
 
   // await new Promise((resolve) => setTimeout(resolve, 5000));
 
   return {
     rows,
     totalCount,
-    totalPages,
-    page: safePage,
   };
 }
