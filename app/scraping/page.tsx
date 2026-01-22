@@ -29,28 +29,27 @@ export default function ScrapingPage() {
     }
   };
 
-  const searchCharacterData = () => {
+  useEffect(() => {
+    if (!characterData) {
+      setHitCharacters([]);
+      return;
+    }
+
     const tmpCharacters: CharacterDetail[] = [];
     let maxKick = 0;
-    characterData?.characterDetailList.forEach((character) => {
+    characterData.characterDetailList.forEach((character) => {
       const kickValue = parseInt(character.kick, 10);
       if (kickValue > maxKick) {
         maxKick = kickValue;
       }
     });
-    characterData?.characterDetailList.forEach((character) => {
+    characterData.characterDetailList.forEach((character) => {
       const kickValue = parseInt(character.kick, 10);
       if (kickValue === maxKick) {
         tmpCharacters.push(character);
       }
     });
     setHitCharacters(tmpCharacters);
-  };
-
-  useEffect(() => {
-    if (characterData) {
-      searchCharacterData();
-    }
   }, [characterData]);
 
   return (
