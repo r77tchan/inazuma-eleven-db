@@ -19,8 +19,22 @@ const TablePart = memo(function TablePart({
 }: TablePartProps) {
   const tableScrollRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef(false);
+  const pointerIdRef = useRef<number | null>(null);
   const dragStartXRef = useRef(0);
   const dragStartScrollLeftRef = useRef(0);
+
+  const rafIdRef = useRef<number | null>(null);
+  const latestClientXRef = useRef(0);
+
+  const applyDragScroll = () => {
+    rafIdRef.current = null;
+    if (!isDraggingRef.current) return;
+    const el = tableScrollRef.current;
+    if (!el) return;
+
+    const dx = latestClientXRef.current - dragStartXRef.current;
+    el.scrollLeft = dragStartScrollLeftRef.current - dx;
+  };
 
   const onTablePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     // タッチはブラウザ標準スクロールに任せる
@@ -36,7 +50,9 @@ const TablePart = memo(function TablePart({
     if (!el) return;
 
     isDraggingRef.current = true;
+    pointerIdRef.current = e.pointerId;
     dragStartXRef.current = e.clientX;
+    latestClientXRef.current = e.clientX;
     dragStartScrollLeftRef.current = el.scrollLeft;
     // ポインターキャプチャを設定（テーブル外にポインターが出てもポインターイベントを受け取る）
     el.setPointerCapture(e.pointerId);
@@ -47,11 +63,14 @@ const TablePart = memo(function TablePart({
 
   const onTablePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current) return;
+    if (pointerIdRef.current !== e.pointerId) return;
     const el = tableScrollRef.current;
     if (!el) return;
 
-    const dx = e.clientX - dragStartXRef.current;
-    el.scrollLeft = dragStartScrollLeftRef.current - dx;
+    latestClientXRef.current = e.clientX;
+    if (rafIdRef.current == null) {
+      rafIdRef.current = window.requestAnimationFrame(applyDragScroll);
+    }
     // ドラッグ中のテキスト選択を抑える
     e.preventDefault();
   };
@@ -59,6 +78,13 @@ const TablePart = memo(function TablePart({
   const endTableDrag = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
+    pointerIdRef.current = null;
+
+    if (rafIdRef.current != null) {
+      window.cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+
     const el = tableScrollRef.current;
     if (el) {
       try {
