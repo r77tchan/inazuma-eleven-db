@@ -1,4 +1,4 @@
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import type { ChangeEvent } from "react";
 
 import type { MetricKey } from "@/lib/characterMetrics";
@@ -22,12 +22,30 @@ export default function TabPart({
   searchResultMode: "overwrite" | "append";
   setSearchResultMode: (mode: "overwrite" | "append") => void;
   viewTableColumn: { [key: string]: boolean };
-  changeViewTableColumn: (e: ChangeEvent<HTMLInputElement>) => void;
+  changeViewTableColumn: (name: string, checked: boolean) => void;
   canSort: boolean;
   handleSort: (key: MetricKey) => void;
 }) {
   const [sortKey, setSortKey] = useState<MetricKey>("totalStatus");
   const [isSortingPending, startSortingTransition] = useTransition();
+  const [, startViewColumnTransition] = useTransition();
+  const [localViewTableColumn, setLocalViewTableColumn] =
+    useState(viewTableColumn);
+
+  useEffect(() => {
+    setLocalViewTableColumn(viewTableColumn);
+  }, [viewTableColumn]);
+
+  const handleViewColumnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setLocalViewTableColumn((prev) => {
+      return {
+        ...prev,
+        [name]: checked,
+      };
+    });
+    startViewColumnTransition(() => changeViewTableColumn(name, checked));
+  };
 
   return (
     <div className="mx-2 pb-8 sm:mx-4">
@@ -134,8 +152,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="remove"
-                    checked={viewTableColumn["remove"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["remove"]}
+                    onChange={handleViewColumnChange}
                   />
                   除外ボタン
                 </label>
@@ -143,8 +161,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="gender"
-                    checked={viewTableColumn["gender"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["gender"]}
+                    onChange={handleViewColumnChange}
                   />
                   性別
                 </label>
@@ -152,8 +170,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="element"
-                    checked={viewTableColumn["element"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["element"]}
+                    onChange={handleViewColumnChange}
                   />
                   属性
                 </label>
@@ -161,8 +179,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="position"
-                    checked={viewTableColumn["position"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["position"]}
+                    onChange={handleViewColumnChange}
                   />
                   ポジション
                 </label>
@@ -170,8 +188,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="kick"
-                    checked={viewTableColumn["kick"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["kick"]}
+                    onChange={handleViewColumnChange}
                   />
                   キック
                 </label>
@@ -179,8 +197,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="control"
-                    checked={viewTableColumn["control"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["control"]}
+                    onChange={handleViewColumnChange}
                   />
                   コントロール
                 </label>
@@ -188,8 +206,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="technique"
-                    checked={viewTableColumn["technique"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["technique"]}
+                    onChange={handleViewColumnChange}
                   />
                   テクニック
                 </label>
@@ -197,8 +215,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="pressure"
-                    checked={viewTableColumn["pressure"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["pressure"]}
+                    onChange={handleViewColumnChange}
                   />
                   プレッシャー
                 </label>
@@ -206,8 +224,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="physical"
-                    checked={viewTableColumn["physical"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["physical"]}
+                    onChange={handleViewColumnChange}
                   />
                   フィジカル
                 </label>
@@ -215,8 +233,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="agility"
-                    checked={viewTableColumn["agility"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["agility"]}
+                    onChange={handleViewColumnChange}
                   />
                   アジリティ
                 </label>
@@ -224,8 +242,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="intelligence"
-                    checked={viewTableColumn["intelligence"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["intelligence"]}
+                    onChange={handleViewColumnChange}
                   />
                   インテリジェンス
                 </label>
@@ -233,8 +251,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="totalStatus"
-                    checked={viewTableColumn["totalStatus"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["totalStatus"]}
+                    onChange={handleViewColumnChange}
                   />
                   ステータス合計
                 </label>
@@ -242,8 +260,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="shootAT"
-                    checked={viewTableColumn["shootAT"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["shootAT"]}
+                    onChange={handleViewColumnChange}
                   />
                   シュートAT
                 </label>
@@ -251,8 +269,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="focusAT"
-                    checked={viewTableColumn["focusAT"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["focusAT"]}
+                    onChange={handleViewColumnChange}
                   />
                   フォーカスAT
                 </label>
@@ -260,8 +278,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="focusDF"
-                    checked={viewTableColumn["focusDF"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["focusDF"]}
+                    onChange={handleViewColumnChange}
                   />
                   フォーカスDF
                 </label>
@@ -269,8 +287,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="scrambleAT"
-                    checked={viewTableColumn["scrambleAT"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["scrambleAT"]}
+                    onChange={handleViewColumnChange}
                   />
                   スクランブルAT
                 </label>
@@ -278,8 +296,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="scrambleDF"
-                    checked={viewTableColumn["scrambleDF"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["scrambleDF"]}
+                    onChange={handleViewColumnChange}
                   />
                   スクランブルDF
                 </label>
@@ -287,8 +305,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="wallDF"
-                    checked={viewTableColumn["wallDF"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["wallDF"]}
+                    onChange={handleViewColumnChange}
                   />
                   城壁DF
                 </label>
@@ -296,8 +314,8 @@ export default function TabPart({
                   <input
                     type="checkbox"
                     name="KP"
-                    checked={viewTableColumn["KP"]}
-                    onChange={changeViewTableColumn}
+                    checked={localViewTableColumn["KP"]}
+                    onChange={handleViewColumnChange}
                   />
                   KP
                 </label>

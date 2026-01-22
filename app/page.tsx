@@ -48,14 +48,16 @@ export default function Home() {
   const [searchResult, setSearchResult] =
     useState<SearchCharactersResponse | null>(null);
   const [isPending, startTransition] = useTransition(); //startTransition(fn)内で行うsetStateは低優先度の更新となり、UIの即時応答を阻害しない
+  const [, startViewColumnTransition] = useTransition();
 
-  const changeViewTableColumn = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setViewTableColumn((prev) => {
-      return {
-        ...prev,
-        [name]: checked,
-      };
+  const changeViewTableColumn = (name: string, checked: boolean) => {
+    startViewColumnTransition(() => {
+      setViewTableColumn((prev) => {
+        return {
+          ...prev,
+          [name]: checked,
+        };
+      });
     });
   };
 
