@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import type { ChangeEvent } from "react";
 
 import type { MetricKey } from "@/lib/characterMetrics";
 
@@ -21,11 +22,12 @@ export default function TabPart({
   searchResultMode: "overwrite" | "append";
   setSearchResultMode: (mode: "overwrite" | "append") => void;
   viewTableColumn: { [key: string]: boolean };
-  changeViewTableColumn: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  changeViewTableColumn: (e: ChangeEvent<HTMLInputElement>) => void;
   canSort: boolean;
   handleSort: (key: MetricKey) => void;
 }) {
   const [sortKey, setSortKey] = useState<MetricKey>("totalStatus");
+  const [isSortingPending, startSortingTransition] = useTransition();
 
   return (
     <div className="mx-2 pb-8 sm:mx-4">
@@ -319,12 +321,21 @@ export default function TabPart({
                   <option value="KP">KP</option>
                 </select>
                 <button
-                  className="bg-tab-exe-button rounded border p-2 hover:cursor-pointer hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:brightness-100"
+                  className="bg-tab-exe-button flex items-center gap-2 rounded border p-2 hover:cursor-pointer hover:brightness-95 active:brightness-90 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:brightness-100"
                   type="button"
-                  disabled={!canSort}
-                  onClick={() => handleSort(sortKey)}
+                  aria-busy={isSortingPending}
+                  disabled={!canSort || isSortingPending}
+                  onClick={() =>
+                    startSortingTransition(() => handleSort(sortKey))
+                  }
                 >
-                  実行
+                  {isSortingPending && (
+                    <span
+                      className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {isSortingPending ? "実行中" : "実行"}
                 </button>
               </div>
             </div>
