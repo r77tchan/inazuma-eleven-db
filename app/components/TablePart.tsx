@@ -171,14 +171,14 @@ const TablePart = memo(function TablePart({
                 <td>{row.character_no}</td>
                 <td className="text-left">
                   <div className="inline-flex w-max items-center gap-3 whitespace-nowrap">
-                    <Image
+                    <img
                       src={row.image_url}
                       alt={row.full_name.map((n) => n.name).join("")}
                       width={48}
                       height={48}
-                      sizes="48px"
+                      loading="lazy"
+                      decoding="async"
                       className="h-12 w-12 shrink-0"
-                      unoptimized
                     />
                     <div className="flex w-max flex-col">
                       <div>{row.full_name.map((n) => n.name).join("")}</div>
