@@ -178,6 +178,7 @@ const TablePart = memo(function TablePart({
                       height={48}
                       sizes="48px"
                       className="h-12 w-12 shrink-0"
+                      unoptimized
                     />
                     <div className="flex w-max flex-col">
                       <div>{row.full_name.map((n) => n.name).join("")}</div>
