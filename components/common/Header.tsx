@@ -2,9 +2,9 @@ import Link from "next/link";
 
 export default function Header() {
   return (
-    <header className="bg-a-0 text-a-1000">
+    <header className="bg-bar text-white">
       <h1 className="text-2xl font-bold">
-        <Link href="/" className="hover:bg-a-300 inline-block p-4">
+        <Link href="/" className="inline-block p-4 hover:bg-gray-700">
           イナイレDB
         </Link>
       </h1>

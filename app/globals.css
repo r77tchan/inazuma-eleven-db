@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 :root {
+  --hero-bg-1: #030712;
+  --hero-bg-2: #101828;
+  --hero-bg-3: #1e2939;
+  --bar: #000000;
   --a-0: #000000;
   --a-50: #030712;
   --a-100: #101828;
@@ -19,6 +23,7 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-bar: var(--bar);
   --color-a-0: var(--a-0);
   --color-a-50: var(--a-50);
   --color-a-100: var(--a-100);
@@ -36,6 +41,10 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --hero-bg-1: #0a1628;
+    --hero-bg-2: #162030;
+    --hero-bg-3: #1e3048;
+    --bar: #030712;
     --a-0: #ffffff;
     --a-50: #f9fafb;
     --a-100: #f3f4f6;
@@ -53,7 +62,7 @@
 }
 
 body {
-  background: var(--a-0);
+  background: var(--bar);
   color: var(--a-1000);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -62,4 +71,22 @@ main {
   background: var(--a-1000);
   color: var(--a-0);
   min-height: 100vh;
+}
+
+/* スクロールバーのカスタマイズ */
+/* Chrome / Edge / Safari */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #ff3939;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-track {
+  background-color: #3273dc40;
+}
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #ff3939 #3273dc40;
 }

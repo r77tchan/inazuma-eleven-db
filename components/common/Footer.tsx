@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="bg-a-0 text-a-600">
+    <footer className="bg-bar text-gray-400">
       <p className="p-2 text-center">
         <small className="text-sm">
           公式inagleは
