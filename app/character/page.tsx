@@ -132,7 +132,10 @@ export default function CharacterPage() {
       </div>
 
       {isLoading && (
-        <p className="text-a-500 py-12 text-center">データを読み込み中...</p>
+        <div className="flex flex-col items-center gap-3 py-12">
+          <div className="border-a-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+          <p className="text-a-500 text-sm">データを読み込み中...</p>
+        </div>
       )}
 
       {error && <p className="py-12 text-center text-red-500">{error}</p>}
@@ -159,7 +162,10 @@ export default function CharacterPage() {
           <div ref={sentinelRef} className="h-4" />
 
           {hasMore && (
-            <p className="text-a-500 py-4 text-center text-sm">読み込み中...</p>
+            <div className="flex items-center justify-center gap-2 py-4">
+              <div className="border-a-500 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+              <p className="text-a-500 text-sm">読み込み中...</p>
+            </div>
           )}
         </>
       )}
