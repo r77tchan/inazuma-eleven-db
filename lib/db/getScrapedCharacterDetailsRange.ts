@@ -1,0 +1,26 @@
+import "server-only";
+
+import { supabaseAdmin } from "@/lib/db/admin";
+import type { ScrapedCharacterDetailRow } from "@/lib/types";
+
+export async function getScrapedCharacterDetailsRange(
+  offset: number,
+  limit: number,
+): Promise<ScrapedCharacterDetailRow[]> {
+  const safeOffset = Number.isFinite(offset) // NaN、Infinity、文字列はfalseになる
+    ? Math.max(0, Math.trunc(offset)) // 小数点以下を切り捨て、負の値は0に
+    : 0;
+  const safeLimit = Number.isFinite(limit) ? Math.max(1, Math.trunc(limit)) : 1;
+
+  const { data, error } = await supabaseAdmin
+    .from("scraped_character_details")
+    .select("*")
+    .order("character_no", { ascending: true }) // 昇順
+    .range(safeOffset, safeOffset + safeLimit - 1);
+
+  if (error) {
+    throw new Error(`Supabase select failed: ${error.message}`);
+  }
+
+  return (data ?? []) as ScrapedCharacterDetailRow[];
+}
