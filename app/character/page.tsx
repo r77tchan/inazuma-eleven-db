@@ -1,6 +1,6 @@
 "use client";
 
-import { CharacterCard } from "./CharacterCard";
+import { CharacterCard, ICON_FIELDS } from "./CharacterCard";
 import {
   FILTER_OPTIONS,
   INFO_FIELD_OPTIONS,
@@ -51,19 +51,32 @@ export default function CharacterPage() {
                 {label}
               </p>
               <div className="flex flex-wrap gap-1">
-                {values.map((value) => (
-                  <button
-                    key={value}
-                    onClick={() => toggleFilter(filterKey, value)}
-                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                      filters[filterKey].includes(value)
-                        ? "bg-a-0 text-a-1000"
-                        : "text-a-400 hover:text-a-200 bg-a-900 hover:bg-a-800"
-                    }`}
-                  >
-                    {value}
-                  </button>
-                ))}
+                {values.map((value) => {
+                  const iconSrc = ICON_FIELDS[filterKey]?.[value];
+                  return (
+                    <button
+                      key={value}
+                      onClick={() => toggleFilter(filterKey, value)}
+                      className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                        filters[filterKey].includes(value)
+                          ? "bg-a-0 text-a-1000"
+                          : "text-a-400 hover:text-a-200 bg-a-900 hover:bg-a-800"
+                      }`}
+                    >
+                      {iconSrc ? (
+                        <img
+                          src={iconSrc}
+                          alt={value}
+                          width={16}
+                          height={16}
+                          className="h-4 w-4"
+                        />
+                      ) : (
+                        value
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           );
