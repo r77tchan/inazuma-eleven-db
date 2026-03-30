@@ -44,7 +44,7 @@ export default function Home() {
             />
             <h4 className="mb-2 text-lg font-bold">キャラクター</h4>
             <p className="text-a-500 mb-4 text-sm">
-              ビルドを確認(未実装)、ステータスでソートなど
+              ビルドを確認(未実装)、ステータスでソート
             </p>
             <span className="bg-a-900 group-hover:bg-a-800 inline-block rounded-md px-4 py-2 text-sm font-medium transition">
               詳しく見る →
@@ -75,7 +75,7 @@ export default function Home() {
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
             <time dateTime="2026-03-31">2026-03-31</time>:
-            仮公開（オリオン後半アップデートを収録）
+            オリオン後半アップデートを収録
           </li>
         </ul>
       </section>
