@@ -43,29 +43,26 @@ export default function Home() {
               className="mb-4 size-18"
             />
             <h4 className="mb-2 text-lg font-bold">キャラクター</h4>
-            <p className="text-a-500 mb-4 text-sm">
-              ビルドを確認(未実装)、ステータスでソート
-            </p>
+            <p className="text-a-500 mb-4 text-sm">フィルタ＆ソート機能</p>
             <span className="bg-a-900 group-hover:bg-a-800 inline-block rounded-md px-4 py-2 text-sm font-medium transition">
               詳しく見る →
             </span>
           </Link>
 
-          <Link
-            href="/skill"
-            className="group border-a-800 cursor-not-allowed rounded-xl border p-6 transition"
-          >
+          <span className="group border-a-800 cursor-not-allowed rounded-xl border p-6 transition">
             <img
               src="https://dxi4wb638ujep.cloudfront.net/1/k/a/d/adammie74y0.webp"
               alt="必殺技"
               className="mb-4 size-18"
             />
             <h4 className="mb-2 text-lg font-bold">必殺技</h4>
-            <p className="text-a-500 mb-4 text-sm">ボイス＆入手先を収録</p>
+            <p className="text-a-500 mb-4 text-sm">
+              ボイス＆入手先を収録したい
+            </p>
             <span className="bg-a-900 inline-block rounded-md px-4 py-2 text-sm font-medium transition">
               準備中
             </span>
-          </Link>
+          </span>
         </div>
       </section>
 

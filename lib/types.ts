@@ -71,6 +71,20 @@ export type ScrapedCharacterDetailWithMetrics = ScrapedCharacterDetail & {
   KP: number | null;
 };
 
+export type PlayerMasterVariant = {
+  name: string;
+  gender: string;
+  element: string;
+  position: string;
+  build: string;
+  note: string;
+};
+
+export type PlayerMasterEntry = {
+  id: string;
+  variants: PlayerMasterVariant[];
+};
+
 export type ScrapedCharacterDetailRow = {
   character_no: number;
   detail_url: string;

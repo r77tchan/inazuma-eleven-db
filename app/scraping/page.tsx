@@ -1,6 +1,7 @@
 "use client";
 
 import { DiffResultView } from "./DiffResultView";
+import { GoogleSheetsImportSection } from "./GoogleSheetsImportSection";
 import { ScrapingControls } from "./ScrapingControls";
 import { useScrapingPage } from "./useScrapingPage";
 
@@ -36,6 +37,7 @@ export default function ScrapingPage() {
         onShowDiff={handleShowDiff}
       />
       {diffResult && <DiffResultView diffResult={diffResult} />}
+      <GoogleSheetsImportSection dbData={dbData} />
     </div>
   );
 }
