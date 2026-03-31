@@ -72,7 +72,7 @@ export default function Home() {
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
             <time dateTime="2026-03-31">2026-03-31</time>:
-            オリオン後半アップデートを収録
+            オリオン後半アップデート収録
           </li>
         </ul>
       </section>
