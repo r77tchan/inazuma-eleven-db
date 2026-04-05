@@ -23,7 +23,6 @@ export function CharacterCard({
 
   return (
     <div className="flex items-center gap-3 rounded border p-2">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={character.imageUrl}
         alt={character.fullName.name}
