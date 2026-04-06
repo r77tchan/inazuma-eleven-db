@@ -7,10 +7,10 @@ import {
   createLocalOnlyErrorResponse,
 } from "@/lib/api";
 
-import { SCRAPED_CHARACTER_DETAILS_CACHE_TAG } from "@/lib/db/scraped_character_details/cache";
+import { SCRAPED_CHARACTER_DETAILS_CACHE_TAG } from "@/lib/db/scraped-character-details/cache";
 import type { ScrapedCharacterDetailWithMetrics } from "@/lib/types";
 
-import { upsertScrapedCharacterDetails } from "@/lib/db/scraped_character_details/upsertScrapedCharacterDetails";
+import { upsertScrapedCharacterDetails } from "@/lib/db/scraped-character-details/upsertScrapedCharacterDetails";
 
 export type ApiSaveDbDataRequest = {
   scrapedData: ScrapedCharacterDetailWithMetrics[];

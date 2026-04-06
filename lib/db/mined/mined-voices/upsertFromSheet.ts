@@ -1,5 +1,5 @@
 // 実行方法:
-// npx tsx --env-file=.env.local lib/db/mined/mined_voices/upsertFromSheet.ts
+// npx tsx --env-file=.env.local lib/db/mined/mined-voices/upsertFromSheet.ts
 
 import { createClient } from "@supabase/supabase-js";
 

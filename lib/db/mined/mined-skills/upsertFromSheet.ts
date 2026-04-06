@@ -1,5 +1,5 @@
 // 実行方法:
-// npx tsx --env-file=.env.local lib/db/mined/mined_skills/upsertFromSheet.ts
+// npx tsx --env-file=.env.local lib/db/mined/mined-skills/upsertFromSheet.ts
 
 import { createClient } from "@supabase/supabase-js";
 
