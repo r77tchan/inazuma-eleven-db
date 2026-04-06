@@ -2,11 +2,11 @@ import "server-only";
 
 import { cacheLife, cacheTag } from "next/cache";
 
-import { getScrapedCharacterDetailsRange } from "@/lib/db/getScrapedCharacterDetailsRange";
+import { getScrapedCharacterDetailsRange } from "@/lib/db/scraped_character_details/getScrapedCharacterDetailsRange";
 import {
   SCRAPED_CHARACTER_DETAILS_CACHE_LIFE,
   SCRAPED_CHARACTER_DETAILS_CACHE_TAG,
-} from "@/lib/db/cache";
+} from "@/lib/db/scraped_character_details/cache";
 import type {
   ScrapedCharacterDetailRow,
   ScrapedCharacterDetailWithMetrics,

@@ -121,3 +121,68 @@ export type ScrapedCharacterDetailRow = {
   created_at: string;
   updated_at: string;
 };
+
+export type MinedCharacterRow = {
+  character_id: string;
+  full_name: string;
+  full_name_ruby: string;
+  nickname: string;
+  nickname_ruby: string;
+  position: string;
+  sub_position: string;
+  element: string;
+  gender: string;
+  physique: string;
+  build_type: string;
+  description: string;
+  kick_legend: number;
+  control_legend: number;
+  technique_legend: number;
+  pressure_legend: number;
+  physical_legend: number;
+  intelligence_legend: number;
+  agility_legend: number;
+  total_status_legend: number;
+  kick_basara: number;
+  control_basara: number;
+  technique_basara: number;
+  pressure_basara: number;
+  physical_basara: number;
+  intelligence_basara: number;
+  agility_basara: number;
+  total_status_basara: number;
+  image_url: string;
+  is_obtainable: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type MinedSkillRow = {
+  skill_id: string;
+  name: string;
+  name_ruby: string;
+  type: string;
+  option: string;
+  tension: number;
+  power: number;
+  recast: number;
+  element: string;
+  number_of_people: number;
+  foul_rate: number;
+  is_mixi_max: boolean;
+  is_override: boolean;
+  is_keshin: boolean;
+  is_soul: boolean;
+  where_to_get: string;
+  image_url: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type MinedVoiceRow = {
+  id: string;
+  character_id: string;
+  skill_id: string;
+  created_at: string;
+  updated_at: string;
+};

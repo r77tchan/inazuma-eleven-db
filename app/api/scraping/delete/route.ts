@@ -6,8 +6,8 @@ import {
   createApiFailureResponse,
   createLocalOnlyErrorResponse,
 } from "@/lib/api";
-import { SCRAPED_CHARACTER_DETAILS_CACHE_TAG } from "@/lib/db/cache";
-import { truncateScrapedCharacterDetails } from "@/lib/db/truncateScrapedCharacterDetails";
+import { SCRAPED_CHARACTER_DETAILS_CACHE_TAG } from "@/lib/db/scraped_character_details/cache";
+import { truncateScrapedCharacterDetails } from "@/lib/db/scraped_character_details/truncateScrapedCharacterDetails";
 
 export type ApiDeleteDbDataSuccess = {
   message: string;
