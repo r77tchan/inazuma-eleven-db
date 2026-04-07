@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import type { ApiGetDbDataSuccess } from "@/app/api/get-db-data/route";
+import type { ApiGetDbDataSuccess } from "@/app/api/get-scraped-character-details/route";
 import type { ApiDeleteDbDataSuccess } from "@/app/api/scraping/delete/route";
 import type {
   ApiSaveDbDataRequest,
@@ -105,7 +105,7 @@ export function useScrapingPage() {
 
   const handleDbDataOutput = async () => {
     await runApiRequest<ApiGetDbDataSuccess>({
-      url: "/api/get-db-data",
+      url: "/api/get-scraped-character-details",
       method: "GET",
       loadingMessage: "DBデータを取得中...",
       onSuccess: (data) => {

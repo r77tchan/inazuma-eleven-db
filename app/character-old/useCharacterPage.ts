@@ -2,28 +2,24 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { ApiGetMinedCharactersSuccess } from "@/app/api/get-mined-characters/route";
+import type { ApiGetDbDataSuccess } from "@/app/api/get-scraped-character-details/route";
 import type { ApiFailure } from "@/lib/api";
-import type { MinedCharacterRow } from "@/lib/types";
+import type { ScrapedCharacterDetailWithMetrics } from "@/lib/types";
 
 const PAGE_SIZE = 50;
-
-export const STAT_VARIANTS = ["legend", "basara"] as const;
-export type StatVariant = (typeof STAT_VARIANTS)[number];
 
 export const INFO_FIELD_OPTIONS = [
   { key: "position", label: "ポジション" },
   { key: "element", label: "属性" },
   { key: "gender", label: "性別" },
-  { key: "build_type", label: "体型" },
-  { key: "total_status", label: "総合" },
-  { key: "kick", label: "キック" },
-  { key: "control", label: "コントロール" },
-  { key: "technique", label: "テクニック" },
-  { key: "pressure", label: "プレッシャー" },
-  { key: "physical", label: "フィジカル" },
-  { key: "intelligence", label: "知力" },
-  { key: "agility", label: "スピード" },
+  { key: "totalStatus", label: "総合" },
+  { key: "shootAT", label: "シュート" },
+  { key: "focusAT", label: "フォーカスAT" },
+  { key: "focusDF", label: "フォーカスDF" },
+  { key: "scrambleAT", label: "スクランブルAT" },
+  { key: "scrambleDF", label: "スクランブルDF" },
+  { key: "wallDF", label: "城壁" },
+  { key: "KP", label: "KP" },
 ] as const;
 
 export type InfoFieldKey = (typeof INFO_FIELD_OPTIONS)[number]["key"];
@@ -32,19 +28,19 @@ const DEFAULT_INFO_FIELDS: InfoFieldKey[] = [
   "position",
   "element",
   "gender",
-  "total_status",
+  "totalStatus",
 ];
 
 export const SORT_FIELD_OPTIONS = [
-  { key: "character_id", label: "ID" },
-  { key: "total_status", label: "総合" },
-  { key: "kick", label: "キック" },
-  { key: "control", label: "コントロール" },
-  { key: "technique", label: "テクニック" },
-  { key: "pressure", label: "プレッシャー" },
-  { key: "physical", label: "フィジカル" },
-  { key: "intelligence", label: "知力" },
-  { key: "agility", label: "スピード" },
+  { key: "characterNo", label: "No" },
+  { key: "totalStatus", label: "総合" },
+  { key: "shootAT", label: "シュート" },
+  { key: "focusAT", label: "フォーカスAT" },
+  { key: "focusDF", label: "フォーカスDF" },
+  { key: "scrambleAT", label: "スクランブルAT" },
+  { key: "scrambleDF", label: "スクランブルDF" },
+  { key: "wallDF", label: "城壁" },
+  { key: "KP", label: "KP" },
 ] as const;
 
 export type SortFieldKey = (typeof SORT_FIELD_OPTIONS)[number]["key"];
@@ -67,7 +63,7 @@ export const FILTER_OPTIONS = {
 
 export type FilterKey = keyof typeof FILTER_OPTIONS;
 
-/** カタカナ→ひらがな、全角英数→半角英数に変換して小文字化 */
+/** カタカナ→ひらがな、全角英数→半角英数に変換して小文字化（表記揺れ不問検索用） */
 function normalizeForSearch(s: string): string {
   return s
     .toLowerCase()
@@ -79,42 +75,19 @@ function normalizeForSearch(s: string): string {
     );
 }
 
-/** statVariant に応じたステータスフィールド名を返す */
-function getStatField(
-  base: string,
-  variant: StatVariant,
-): keyof MinedCharacterRow {
-  return `${base}_${variant}` as keyof MinedCharacterRow;
-}
-
-/** ステータス値を取得 */
-export function getStatValue(
-  character: MinedCharacterRow,
-  key: InfoFieldKey | SortFieldKey,
-  variant: StatVariant,
-): number | string | boolean {
-  if (
-    key === "position" ||
-    key === "element" ||
-    key === "gender" ||
-    key === "build_type" ||
-    key === "character_id"
-  ) {
-    return character[key];
-  }
-  const statBase = key === "total_status" ? "total_status" : key;
-  return character[getStatField(statBase, variant)] as number;
-}
-
 export function useCharacterPage() {
-  const [allData, setAllData] = useState<MinedCharacterRow[] | null>(null);
+  const [allData, setAllData] = useState<
+    ScrapedCharacterDetailWithMetrics[] | null
+  >(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statVariant, setStatVariant] = useState<StatVariant>("legend");
+  const [nameDisplay, setNameDisplay] = useState<"fullName" | "nickname">(
+    "fullName",
+  );
   const [selectedInfoFields, setSelectedInfoFields] =
     useState<InfoFieldKey[]>(DEFAULT_INFO_FIELDS);
-  const [sortField, setSortField] = useState<SortFieldKey>("character_id");
+  const [sortField, setSortField] = useState<SortFieldKey>("characterNo");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [filters, setFilters] = useState<Record<FilterKey, string[]>>({
     position: [],
@@ -136,7 +109,7 @@ export function useCharacterPage() {
         setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
       } else {
         setSortField(key);
-        setSortDirection(key === "character_id" ? "asc" : "desc");
+        setSortDirection(key === "characterNo" ? "asc" : "desc");
       }
       setDisplayCount(PAGE_SIZE);
     },
@@ -153,14 +126,14 @@ export function useCharacterPage() {
     setDisplayCount(PAGE_SIZE);
   }, []);
 
-  // データ取得
+  // 全データ取得
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/api/get-mined-characters");
+        const response = await fetch("/api/get-scraped-character-details");
         if (response.ok) {
-          const data: ApiGetMinedCharactersSuccess = await response.json();
-          setAllData(data.data);
+          const data: ApiGetDbDataSuccess = await response.json();
+          setAllData(data.dbData);
         } else {
           const errorData: ApiFailure = await response.json();
           setError(errorData.errorMessage);
@@ -174,11 +147,12 @@ export function useCharacterPage() {
     fetchData();
   }, []);
 
-  // フィルタ + 検索
+  // 名前検索でフィルタ
   const filteredData = useMemo(() => {
     if (!allData) return [];
     let result = allData;
 
+    // フィルタ適用
     for (const key of Object.keys(filters) as FilterKey[]) {
       const selected = filters[key];
       if (selected.length > 0) {
@@ -186,14 +160,18 @@ export function useCharacterPage() {
       }
     }
 
+    // 名前検索
     if (searchTerm) {
       const term = normalizeForSearch(searchTerm);
       result = result.filter(
         (c) =>
-          normalizeForSearch(c.full_name).includes(term) ||
-          normalizeForSearch(c.full_name_ruby).includes(term) ||
-          normalizeForSearch(c.nickname).includes(term) ||
-          normalizeForSearch(c.nickname_ruby).includes(term),
+          normalizeForSearch(c.fullName.name).includes(term) ||
+          normalizeForSearch(c.fullName.ruby).includes(term) ||
+          c.nickname.some(
+            (n) =>
+              normalizeForSearch(n.name).includes(term) ||
+              normalizeForSearch(n.ruby).includes(term),
+          ),
       );
     }
 
@@ -204,15 +182,18 @@ export function useCharacterPage() {
   const sortedData = useMemo(() => {
     const dir = sortDirection === "asc" ? 1 : -1;
     return [...filteredData].sort((a, b) => {
-      const aVal = getStatValue(a, sortField, statVariant);
-      const bVal = getStatValue(b, sortField, statVariant);
+      const aVal =
+        sortField === "characterNo" ? Number(a.characterNo) : a[sortField];
+      const bVal =
+        sortField === "characterNo" ? Number(b.characterNo) : b[sortField];
       if (aVal === null && bVal === null) return 0;
       if (aVal === null) return 1;
       if (bVal === null) return -1;
       return (aVal < bVal ? -1 : aVal > bVal ? 1 : 0) * dir;
     });
-  }, [filteredData, sortField, sortDirection, statVariant]);
+  }, [filteredData, sortField, sortDirection]);
 
+  // 表示するデータ（無限スクロール）
   const visibleData = useMemo(
     () => sortedData.slice(0, displayCount),
     [sortedData, displayCount],
@@ -220,6 +201,7 @@ export function useCharacterPage() {
 
   const hasMore = displayCount < sortedData.length;
 
+  // 検索語変更時に表示数リセット
   const handleSearchChange = useCallback((value: string) => {
     setSearchTerm(value);
     setDisplayCount(PAGE_SIZE);
@@ -248,8 +230,8 @@ export function useCharacterPage() {
     error,
     searchTerm,
     handleSearchChange,
-    statVariant,
-    setStatVariant,
+    nameDisplay,
+    setNameDisplay,
     selectedInfoFields,
     toggleInfoField,
     sortField,

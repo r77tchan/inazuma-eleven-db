@@ -1,10 +1,6 @@
-import type { MinedCharacterRow } from "@/lib/types";
-import {
-  INFO_FIELD_OPTIONS,
-  type InfoFieldKey,
-  type StatVariant,
-  getStatValue,
-} from "./useCharacterPage";
+import type { ScrapedCharacterDetailWithMetrics } from "@/lib/types";
+
+import { INFO_FIELD_OPTIONS, type InfoFieldKey } from "./useCharacterPage";
 
 const POSITION_ICON: Record<string, string> = {
   FW: "/img/icons/position/fw.webp",
@@ -32,56 +28,49 @@ export const ICON_FIELDS: Record<string, Record<string, string>> = {
 };
 
 type CharacterCardProps = {
-  character: MinedCharacterRow;
+  character: ScrapedCharacterDetailWithMetrics;
+  nameDisplay: "fullName" | "nickname";
   infoFields: InfoFieldKey[];
-  statVariant: StatVariant;
 };
 
 export function CharacterCard({
   character,
+  nameDisplay,
   infoFields,
-  statVariant,
 }: CharacterCardProps) {
-  const displayName =
-    character.nickname && character.nickname.length > 0
-      ? character.nickname
-      : character.full_name;
-  const displayRuby =
-    character.nickname_ruby && character.nickname_ruby.length > 0
-      ? character.nickname_ruby
-      : character.full_name_ruby;
+  const showNickname =
+    nameDisplay === "nickname" && character.nickname.length > 0;
+  const displayNameText = showNickname
+    ? character.nickname.map((n) => n.name).join("")
+    : character.fullName.name;
+  const displayRubyText = showNickname
+    ? character.nickname.map((n) => n.ruby).join("")
+    : character.fullName.ruby;
 
   return (
-    <div className="border-a-800 bg-a-950 group hover:border-a-600 flex gap-3 rounded-xl border p-3 transition-colors">
-      {character.image_url && (
+    <div className="border-a-800 bg-a-950 flex gap-3 rounded-lg border p-3">
+      {character.imageUrl && (
         <img
-          src={character.image_url}
-          alt={character.full_name}
-          width={52}
-          height={52}
-          className="h-13 w-13 shrink-0 rounded-lg object-cover"
+          src={character.imageUrl}
+          alt={character.fullName.name}
+          width={48}
+          height={48}
+          className="h-12 w-12 shrink-0 rounded object-cover"
           loading="lazy"
         />
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2">
-          <span className="leading-tight font-bold">{displayName}</span>
-          {displayRuby && (
-            <span className="text-a-500 text-[11px] leading-tight">
-              {displayRuby}
-            </span>
+          <span className="font-bold">{displayNameText}</span>
+          {displayRubyText && (
+            <span className="text-a-500 text-xs">{displayRubyText}</span>
           )}
         </div>
-        {character.sub_position && (
-          <span className="text-a-500 text-[10px]">
-            サブ: {character.sub_position}
-          </span>
-        )}
-        <div className="text-a-400 mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+        <div className="text-a-400 mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs">
           {infoFields.map((key) => {
             const option = INFO_FIELD_OPTIONS.find((o) => o.key === key);
             if (!option) return null;
-            const value = getStatValue(character, key, statVariant);
+            const value = character[key];
             if (value === null || value === undefined || value === "")
               return null;
             const iconMap = ICON_FIELDS[key];
@@ -100,16 +89,17 @@ export function CharacterCard({
               );
             }
             return (
-              <span key={key} className="tabular-nums">
-                <span className="text-a-500">{option.label}</span>{" "}
-                <span className="text-a-200 font-medium">{String(value)}</span>
+              <span key={key}>
+                {typeof value === "number"
+                  ? `${option.label}: ${value}`
+                  : value}
               </span>
             );
           })}
         </div>
       </div>
-      <div className="text-a-600 shrink-0 self-start font-mono text-[10px]">
-        {character.character_id}
+      <div className="text-a-500 shrink-0 text-xs">
+        No.{character.characterNo}
       </div>
     </div>
   );

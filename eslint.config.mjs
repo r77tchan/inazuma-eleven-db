@@ -38,6 +38,7 @@ const eslintConfig = defineConfig([
     "local-scripts/**",
     // Keep the archived app in the repository without linting its sources or build output.
     "old/**",
+    "reference-project/**",
   ]),
 ]);
 
