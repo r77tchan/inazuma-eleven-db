@@ -247,7 +247,9 @@ export type MinedAuraVoiceRow = {
 export type MinedCharacterListView = {
   character_id: string;
   full_name: string;
+  full_name_ruby: string;
   nickname: string;
+  nickname_ruby: string;
   inagle_no: number | null;
   position: string;
   sub_position: string;

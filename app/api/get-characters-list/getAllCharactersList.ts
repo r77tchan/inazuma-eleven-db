@@ -1,7 +1,13 @@
 import "server-only";
 
+import { cacheLife, cacheTag } from "next/cache";
+
 import { supabaseAdmin } from "@/lib/db/admin";
 import { calcStatus } from "@/lib/calcStatus";
+import {
+  CHARACTERS_LIST_CACHE_LIFE,
+  CHARACTERS_LIST_CACHE_TAG,
+} from "@/lib/db/mined/cache";
 import type { MinedCharacterListView } from "@/lib/types";
 
 const CHUNK_SIZE = 500;
@@ -9,7 +15,9 @@ const CHUNK_SIZE = 500;
 type JoinedRow = {
   character_id: string;
   full_name: string;
+  full_name_ruby: string;
   nickname: string;
+  nickname_ruby: string;
   inagle_no: number | null;
   position: string;
   sub_position: string;
@@ -43,6 +51,10 @@ type JoinedRow = {
 export default async function getAllCharactersList(): Promise<
   MinedCharacterListView[]
 > {
+  "use cache";
+  cacheLife(CHARACTERS_LIST_CACHE_LIFE);
+  cacheTag(CHARACTERS_LIST_CACHE_TAG);
+
   const allRows: JoinedRow[] = [];
 
   for (let chunkIndex = 0; ; chunkIndex++) {
@@ -50,7 +62,7 @@ export default async function getAllCharactersList(): Promise<
     const { data, error } = await supabaseAdmin
       .from("mined_characters")
       .select(
-        `character_id, full_name, nickname, inagle_no, position, sub_position,
+        `character_id, full_name, full_name_ruby, nickname, nickname_ruby, inagle_no, position, sub_position,
          element, physique, build_type, image_url, is_obtainable, team, character_role,
          default_status:status_types!legend_status_type_default(kick, control, technique, pressure, physical, intelligence, agility),
          branch_status:status_types!legend_status_type_branch(kick, control, technique, pressure, physical, intelligence, agility)`,
@@ -73,7 +85,9 @@ export default async function getAllCharactersList(): Promise<
     return {
       character_id: row.character_id,
       full_name: row.full_name,
+      full_name_ruby: row.full_name_ruby,
       nickname: row.nickname,
+      nickname_ruby: row.nickname_ruby,
       inagle_no: row.inagle_no,
       position: row.position,
       sub_position: row.sub_position,

@@ -68,24 +68,24 @@ function expandRows(
 export const POSITION_VALUES = ["FW", "MF", "DF", "GK"] as const;
 export const ELEMENT_VALUES = ["風", "林", "火", "山"] as const;
 
-// 体格の順序（並べ替え用 — 必要に応じて順序を変更してください）
+// 体格の順序（並べ替え用 - 必要に応じて順序を変更してください）
 export const PHYSIQUE_ORDER = [
-  "body_male",
-  "body_female",
   "body_small",
-  "body_smallfemale",
   "body_smallfat",
-  "body_smallfatfemale",
+  "body_male",
   "body_tall",
-  "body_tallfemale",
   "body_tallmuscle",
-  "body_tallmusclefemale",
   "body_muscle",
-  "body_musclefemale",
   "body_musclethick",
   "body_big",
-  "body_bigfemale",
   "body_bigthick",
+  "body_smallfemale",
+  "body_smallfatfemale",
+  "body_female",
+  "body_tallfemale",
+  "body_musclefemale",
+  "body_tallmusclefemale",
+  "body_bigfemale",
   "body_bigthickfemale",
 ] as const;
 
@@ -94,8 +94,8 @@ export const BUILD_MAP: Record<string, string> = {
   テンション: "tension",
   カウンター: "counter",
   キズナ: "bond",
-  ラフプレー: "rough_play",
-  ひっさつ: "breach",
+  ラフ: "rough_play",
+  必殺: "breach",
 };
 
 export const BUILD_VALUES = Object.keys(BUILD_MAP);
@@ -105,6 +105,7 @@ export const BUILD_VALUES = Object.keys(BUILD_MAP);
 // ======================================
 
 export const SORT_FIELD_OPTIONS = [
+  { key: "inagle_no", label: "No" },
   { key: "shoot_at", label: "シュート" },
   { key: "focus_at", label: "フォーカスAT" },
   { key: "focus_df", label: "フォーカスDF" },
@@ -115,6 +116,7 @@ export const SORT_FIELD_OPTIONS = [
 ] as const;
 
 export type SortFieldKey = (typeof SORT_FIELD_OPTIONS)[number]["key"];
+export type SortDirection = "asc" | "desc";
 
 export const SECONDARY_SORT_OPTIONS = [
   { key: "inagle_no", label: "No" },
@@ -127,6 +129,8 @@ export type SecondarySortKey = (typeof SECONDARY_SORT_OPTIONS)[number]["key"];
 // ======================================
 // フィルタ状態
 // ======================================
+
+export type ObtainableFilter = "any" | "obtainable" | "unobtainable";
 
 export type Filters = {
   mainPosition: string[];
@@ -173,7 +177,11 @@ export function useCharacterList() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [abillerMode, setAbillerMode] = useState<AbillerMode>("default");
-  const [sortField, setSortField] = useState<SortFieldKey | null>(null);
+  const [obtainableFilter, setObtainableFilter] =
+    useState<ObtainableFilter>("obtainable");
+  const [sortField, setSortField] = useState<SortFieldKey>("inagle_no");
+  const sortFieldRef = useRef<SortFieldKey>("inagle_no");
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [secondarySort, setSecondarySort] =
     useState<SecondarySortKey>("inagle_no");
   const [filters, setFilters] = useState<Filters>({
@@ -187,6 +195,9 @@ export function useCharacterList() {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // --- データ取得 ---
+  // React 18: setState on unmounted component is a safe no-op.
+  // Do NOT use a cancelled guard — it prevents state updates when
+  // Next.js restores the component from its router cache on back-navigation.
   useEffect(() => {
     (async () => {
       try {
@@ -218,7 +229,13 @@ export function useCharacterList() {
   }, []);
 
   const handleSortChange = useCallback((key: SortFieldKey) => {
-    setSortField((prev) => (prev === key ? null : key));
+    if (sortFieldRef.current === key) {
+      setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortDirection(key === "inagle_no" ? "asc" : "desc");
+    }
+    sortFieldRef.current = key;
+    setSortField(key);
     setDisplayCount(PAGE_SIZE);
   }, []);
 
@@ -255,17 +272,25 @@ export function useCharacterList() {
       result = result.filter((c) => filters.build.includes(c.build_type));
     }
 
+    if (obtainableFilter === "obtainable") {
+      result = result.filter((c) => c.is_obtainable);
+    } else if (obtainableFilter === "unobtainable") {
+      result = result.filter((c) => !c.is_obtainable);
+    }
+
     if (searchTerm) {
       const term = normalizeForSearch(searchTerm);
       result = result.filter(
         (c) =>
           normalizeForSearch(c.full_name).includes(term) ||
-          normalizeForSearch(c.nickname).includes(term),
+          normalizeForSearch(c.nickname).includes(term) ||
+          normalizeForSearch(c.full_name_ruby).includes(term) ||
+          normalizeForSearch(c.nickname_ruby).includes(term),
       );
     }
 
     return result;
-  }, [allData, filters, searchTerm]);
+  }, [allData, filters, obtainableFilter, searchTerm]);
 
   // --- アビラー展開 ---
   const expandedRows = useMemo(
@@ -276,13 +301,20 @@ export function useCharacterList() {
   // --- ソート ---
   const sortedData = useMemo(() => {
     const rows = [...expandedRows];
+    const dir = sortDirection === "asc" ? 1 : -1;
 
     rows.sort((a, b) => {
       // primary sort
       if (sortField) {
-        const av = a[sortField];
-        const bv = b[sortField];
-        if (av !== bv) return bv - av; // 降順
+        if (sortField === "inagle_no") {
+          const an = a.inagle_no ?? Infinity;
+          const bn = b.inagle_no ?? Infinity;
+          if (an !== bn) return (an - bn) * dir;
+        } else {
+          const av = a[sortField];
+          const bv = b[sortField];
+          if (av !== bv) return (av - bv) * dir;
+        }
       }
 
       // secondary sort (常に昇順)
@@ -305,7 +337,7 @@ export function useCharacterList() {
     });
 
     return rows;
-  }, [expandedRows, sortField, secondarySort]);
+  }, [expandedRows, sortField, sortDirection, secondarySort]);
 
   // --- 表示件数 ---
   const visibleData = useMemo(
@@ -338,15 +370,22 @@ export function useCharacterList() {
     handleSearchChange,
     abillerMode,
     setAbillerMode,
+    obtainableFilter,
+    setObtainableFilter,
     sortField,
+    sortDirection,
     handleSortChange,
     secondarySort,
     handleSecondarySortChange,
     filters,
     toggleFilter,
     visibleData,
-    totalCount: allData?.length ?? 0,
-    filteredCount: filteredData.length,
+    totalCount:
+      abillerMode === "both"
+        ? (allData?.length ?? 0) * 2
+        : (allData?.length ?? 0),
+    filteredCount:
+      abillerMode === "both" ? filteredData.length * 2 : filteredData.length,
     hasMore,
     sentinelRef,
   };

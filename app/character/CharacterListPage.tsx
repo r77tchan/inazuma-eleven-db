@@ -11,6 +11,7 @@ import {
   SORT_FIELD_OPTIONS,
   SECONDARY_SORT_OPTIONS,
   type AbillerMode,
+  type ObtainableFilter,
   type SortFieldKey,
   type CharacterDisplayRow,
 } from "./useCharacterList";
@@ -33,13 +34,60 @@ const ELEMENT_ICON: Record<string, string> = {
   山: "/img/icons/elements/mountain.webp",
 };
 
-function buildIconSrc(buildType: string): string | null {
+function buildIconSrc(
+  buildType: string,
+): { light: string; dark: string } | null {
   const key = BUILD_MAP[buildType];
-  return key ? `/img/icons/builds/${key}.webp` : null;
+  if (!key) return null;
+  return {
+    light: `/img/icons/builds/${key}.webp`,
+    dark: `/img/icons/builds/${key}-dark.webp`,
+  };
 }
 
 function physiqueIconSrc(physique: string): string {
   return `/img/icons/gender/${physique}.png`;
+}
+
+// =============================================
+// SafeImg — 画像が存在しない場合にグレー四角を表示
+// =============================================
+
+function SafeImg({
+  src,
+  alt,
+  width,
+  height,
+  className,
+  loading,
+}: {
+  src: string | null;
+  alt: string;
+  width: number;
+  height: number;
+  className?: string;
+  loading?: "lazy" | "eager";
+}) {
+  return (
+    <span
+      className={`${className ?? ""} bg-a-700 inline-block overflow-hidden`}
+      style={{ width, height }}
+    >
+      {src && (
+        <img
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          className="h-full w-full object-cover"
+          loading={loading}
+          onError={(e) => {
+            e.currentTarget.style.display = "none";
+          }}
+        />
+      )}
+    </span>
+  );
 }
 
 // =============================================
@@ -48,6 +96,13 @@ function physiqueIconSrc(physique: string): string {
 
 function getSortLabel(key: SortFieldKey | null): string | null {
   if (!key) return null;
+  if (key === "inagle_no") return null; // No はヘッダー左列に表示しない
+  return SORT_FIELD_OPTIONS.find((o) => o.key === key)?.label ?? null;
+}
+
+function getSortLabelForSP(key: SortFieldKey | null): string | null {
+  if (!key) return null;
+  if (key === "inagle_no") return null;
   return SORT_FIELD_OPTIONS.find((o) => o.key === key)?.label ?? null;
 }
 
@@ -55,8 +110,49 @@ function getSortValue(
   row: CharacterDisplayRow,
   key: SortFieldKey | null,
 ): number | null {
-  if (!key) return null;
+  if (!key || key === "inagle_no") return null; // No は左列に表示しない
   return row[key];
+}
+
+// =============================================
+// BuildIconImg （light/dark 切り替え）
+// =============================================
+
+function BuildIconImg({
+  buildType,
+  size,
+  className,
+  invert = false,
+}: {
+  buildType: string;
+  size: number;
+  className?: string;
+  invert?: boolean;
+}) {
+  const srcs = buildIconSrc(buildType);
+  if (!srcs)
+    return (
+      <span
+        className={className}
+        style={{ display: "inline-block", width: size, height: size }}
+      />
+    );
+  // Light theme: dark icon / Dark theme: light icon
+  // invert=true (active button): swap
+  const defaultSrc = invert ? srcs.light : srcs.dark;
+  const darkSrc = invert ? srcs.dark : srcs.light;
+  return (
+    <picture>
+      <source srcSet={darkSrc} media="(prefers-color-scheme: dark)" />
+      <img
+        src={defaultSrc}
+        alt={buildType}
+        width={size}
+        height={size}
+        className={className}
+      />
+    </picture>
+  );
 }
 
 // =============================================
@@ -107,10 +203,10 @@ function ToggleButton({
   return (
     <button
       onClick={onClick}
-      className={`rounded-md px-2.5 py-1 text-xs font-medium ${
+      className={`rounded-md px-2.5 py-1 text-sm font-medium ${
         active
           ? "bg-a-0 text-a-1000"
-          : "text-a-400 hover:text-a-200 bg-a-900 hover:bg-a-800"
+          : "text-a-400 hover:text-a-200 bg-a-800 hover:bg-a-700"
       }`}
     >
       {children}
@@ -124,19 +220,18 @@ function ToggleButton({
 
 function PCHeader({ sortLabel }: { sortLabel: string | null }) {
   return (
-    <div className="text-a-500 border-a-800 hidden border-b pb-1 text-xs md:grid md:grid-cols-[2.5rem_3rem_1fr_2rem_2rem_1.5rem_2.5rem_2rem_4rem_6rem_3rem_3rem] md:items-center md:gap-2">
-      <span className="text-right">{sortLabel ?? ""}</span>
-      <span></span>
+    <div className="col-span-full grid grid-cols-subgrid items-center gap-x-2.5 px-3 pb-2 text-sm text-nowrap">
+      <span className="text-center">{sortLabel ?? ""}</span>
+      <span />
       <span>名前</span>
       <span>メイン</span>
       <span>サブ</span>
       <span>属性</span>
       <span>体格</span>
-      <span>ビルド</span>
+      <span>メインビルド</span>
       <span>カテゴリ</span>
       <span>所属</span>
       <span className="text-right">No</span>
-      <span>アビラー</span>
     </div>
   );
 }
@@ -153,33 +248,33 @@ function PCRow({
   sortField: SortFieldKey | null;
 }) {
   const sortValue = getSortValue(row, sortField);
-  const buildSrc = buildIconSrc(row.build_type);
+  const hasBuild = !!BUILD_MAP[row.build_type];
 
   return (
     <Link
       href={`/character/${row.character_id}`}
-      className="text-a-300 hover:bg-a-950 border-a-900 hidden border-b py-1.5 text-xs md:grid md:grid-cols-[2.5rem_3rem_1fr_2rem_2rem_1.5rem_2.5rem_2rem_4rem_6rem_3rem_3rem] md:items-center md:gap-2"
+      className="border-a-800 col-span-full grid grid-cols-subgrid items-center gap-x-2.5 border-b px-3 py-2 text-sm last:border-b-0 hover:bg-[#3273dc40]"
     >
       {/* ソート値 */}
-      <span className="text-a-0 text-right text-sm font-bold tabular-nums">
+      <span className="text-a-0 text-center font-bold tabular-nums">
         {sortValue != null ? Math.round(sortValue) : ""}
       </span>
 
       {/* アイコン画像 */}
-      <img
+      <SafeImg
         src={row.image_url}
         alt={row.full_name}
-        width={40}
-        height={40}
-        className="h-10 w-10 rounded object-cover"
+        width={80}
+        height={80}
+        className="mx-auto rounded"
         loading="lazy"
       />
 
       {/* 名前 + ニックネーム */}
       <div className="min-w-0">
-        <p className="text-a-0 truncate text-sm font-bold">{row.full_name}</p>
+        <p className="text-a-0 truncate font-bold">{row.full_name}</p>
         {row.nickname && (
-          <p className="text-a-500 truncate text-[10px]">{row.nickname}</p>
+          <p className="text-a-500 truncate text-xs">{row.nickname}</p>
         )}
       </div>
 
@@ -187,50 +282,47 @@ function PCRow({
       <img
         src={POSITION_ICON[row.position]}
         alt={row.position}
-        width={20}
-        height={20}
-        className="h-5 w-5"
+        width={24}
+        height={24}
+        className="h-6 w-6"
       />
 
       {/* サブポジション */}
       <img
         src={POSITION_ICON[row.sub_position]}
         alt={row.sub_position}
-        width={20}
-        height={20}
-        className="h-5 w-5 opacity-60"
+        width={24}
+        height={24}
+        className="h-6 w-6 opacity-60"
       />
 
       {/* 属性 */}
       <img
         src={ELEMENT_ICON[row.element]}
         alt={row.element}
-        width={16}
-        height={16}
-        className="h-4 w-4"
-      />
-
-      {/* 体格 */}
-      <img
-        src={physiqueIconSrc(row.physique)}
-        alt={row.physique}
         width={24}
         height={24}
         className="h-6 w-6"
       />
 
-      {/* メインビルド */}
-      {buildSrc ? (
-        <img
-          src={buildSrc}
-          alt={row.build_type}
-          width={20}
-          height={20}
-          className="h-5 w-5"
+      {/* 体格 */}
+      <SafeImg
+        src={physiqueIconSrc(row.physique)}
+        alt={row.physique}
+        width={24}
+        height={24}
+        className="rounded"
+      />
+
+      {/* メインビルド (icon + text) */}
+      <div className="flex items-center gap-1">
+        <BuildIconImg
+          buildType={row.build_type}
+          size={24}
+          className="h-6 w-6 shrink-0"
         />
-      ) : (
-        <span className="inline-block h-5 w-5" />
-      )}
+        <span className="truncate">{hasBuild ? row.build_type : ""}</span>
+      </div>
 
       {/* カテゴリ */}
       <span className="truncate">{row.character_role ?? ""}</span>
@@ -242,9 +334,6 @@ function PCRow({
       <span className="text-right tabular-nums">
         {row.inagle_no != null ? row.inagle_no : ""}
       </span>
-
-      {/* アビラー */}
-      <span>{row.variant === "default" ? "通常" : "分岐"}</span>
     </Link>
   );
 }
@@ -261,76 +350,81 @@ function SPCard({
   sortField: SortFieldKey | null;
 }) {
   const sortValue = getSortValue(row, sortField);
-  const buildSrc = buildIconSrc(row.build_type);
+  const sortLabel = getSortLabelForSP(sortField);
 
   return (
     <Link
       href={`/character/${row.character_id}`}
-      className="border-a-900 hover:bg-a-950 flex gap-2 border-b py-1.5 md:hidden"
+      className="border-a-800 bg-a-950 flex gap-2.5 border-b p-2 last:border-b-0 hover:bg-[#3273dc40]"
     >
       {/* 左: アイコン（大きめ） */}
-      <img
+      <SafeImg
         src={row.image_url}
         alt={row.full_name}
-        width={56}
-        height={56}
-        className="h-14 w-14 self-stretch rounded object-cover"
+        width={80}
+        height={80}
+        className="shrink-0 self-stretch rounded"
         loading="lazy"
       />
 
-      {/* 中央 */}
+      {/* 中央: 3行 */}
       <div className="flex min-w-0 flex-1 flex-col justify-between">
-        {/* 上段: 名前 + ニックネーム */}
-        <div className="min-w-0">
-          <p className="text-a-0 truncate text-sm font-bold">{row.full_name}</p>
+        {/* Row 1: No（右寄せ） */}
+        <div className="text-a-500 text-right text-xs tabular-nums">
+          {row.inagle_no != null ? `No.${row.inagle_no}` : "\u00A0"}
+        </div>
+
+        {/* Row 2: 名前 + ニックネーム */}
+        <div className="flex min-w-0 items-baseline gap-2">
+          <span className="text-a-0 truncate text-base font-bold">
+            {row.full_name}
+          </span>
           {row.nickname && (
-            <p className="text-a-500 truncate text-[10px]">{row.nickname}</p>
+            <span className="text-a-500 shrink-0 text-xs">{row.nickname}</span>
           )}
         </div>
 
-        {/* 下段: アイコン群 + ソート値 */}
+        {/* Row 3: アイコン群 + ソート値 */}
         <div className="flex items-center gap-1.5">
           <img
             src={POSITION_ICON[row.position]}
             alt={row.position}
-            width={16}
-            height={16}
-            className="h-4 w-4"
-          />
-          <img
-            src={ELEMENT_ICON[row.element]}
-            alt={row.element}
-            width={14}
-            height={14}
-            className="h-3.5 w-3.5"
-          />
-          <img
-            src={physiqueIconSrc(row.physique)}
-            alt={row.physique}
             width={18}
             height={18}
             className="h-4.5 w-4.5"
           />
-          {buildSrc && (
-            <img
-              src={buildSrc}
-              alt={row.build_type}
-              width={16}
-              height={16}
-              className="h-4 w-4"
-            />
-          )}
-          {sortValue != null && (
-            <span className="text-a-0 ml-1 text-xs font-bold tabular-nums">
-              {Math.round(sortValue)}
+          <img
+            src={POSITION_ICON[row.sub_position]}
+            alt={row.sub_position}
+            width={18}
+            height={18}
+            className="h-4.5 w-4.5 opacity-60"
+          />
+          <img
+            src={ELEMENT_ICON[row.element]}
+            alt={row.element}
+            width={18}
+            height={18}
+            className="h-4.5 w-4.5"
+          />
+          <SafeImg
+            src={physiqueIconSrc(row.physique)}
+            alt={row.physique}
+            width={20}
+            height={20}
+            className="rounded"
+          />
+          <BuildIconImg
+            buildType={row.build_type}
+            size={18}
+            className="h-4.5 w-4.5"
+          />
+          {sortValue != null && sortLabel && (
+            <span className="text-a-300 tracking-0 ml-1 text-xs tabular-nums">
+              {sortLabel} {Math.round(sortValue)}
             </span>
           )}
         </div>
-      </div>
-
-      {/* 右上: No */}
-      <div className="text-a-500 shrink-0 self-start text-[10px] tabular-nums">
-        {row.inagle_no != null ? `No.${row.inagle_no}` : ""}
       </div>
     </Link>
   );
@@ -348,7 +442,10 @@ export default function CharacterListPage() {
     handleSearchChange,
     abillerMode,
     setAbillerMode,
+    obtainableFilter,
+    setObtainableFilter,
     sortField,
+    sortDirection,
     handleSortChange,
     secondarySort,
     handleSecondarySortChange,
@@ -361,14 +458,11 @@ export default function CharacterListPage() {
     sentinelRef,
   } = useCharacterList();
 
-  // ここだけの目的で allData にアクセスしたいが hook で直に返さないので
-  // visibleData から physique を集める代わりに PHYSIQUE_ORDER をそのまま使う
   const availablePhysiques = PHYSIQUE_ORDER as readonly string[];
-
   const sortLabel = getSortLabel(sortField);
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="mx-auto max-w-7xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">キャラクター一覧</h1>
 
       {/* 検索 */}
@@ -378,10 +472,10 @@ export default function CharacterListPage() {
           placeholder="名前で検索..."
           value={searchTerm}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="border-a-700 bg-a-950 text-a-0 placeholder:text-a-500 focus:border-a-400 w-full rounded-lg border px-4 py-2 focus:outline-none"
+          className="border-a-700 bg-a-950 text-a-0 placeholder:text-a-500 focus:border-a-400 mb-4 w-full rounded-lg border px-4 py-2 text-base focus:outline-none"
         />
 
-        {/* 赤フィルタ群（同色は横幅に余裕があれば横並び） */}
+        {/* 赤フィルタ群 */}
         <div className="flex flex-wrap gap-x-6 gap-y-3">
           <FilterSection label="メインポジション" color="red">
             {POSITION_VALUES.map((v) => (
@@ -437,44 +531,41 @@ export default function CharacterListPage() {
             ))}
           </FilterSection>
 
-          <FilterSection label="体格" color="red">
-            {availablePhysiques.map((v) => (
-              <ToggleButton
-                key={v}
-                active={filters.physique.includes(v)}
-                onClick={() => toggleFilter("physique", v)}
-              >
-                <img
-                  src={physiqueIconSrc(v)}
-                  alt={v}
-                  width={18}
-                  height={18}
-                  className="h-4.5 w-4.5"
-                />
-              </ToggleButton>
-            ))}
-          </FilterSection>
+          <div className="w-full">
+            <FilterSection label="体格" color="red">
+              {availablePhysiques.map((v) => (
+                <ToggleButton
+                  key={v}
+                  active={filters.physique.includes(v)}
+                  onClick={() => toggleFilter("physique", v)}
+                >
+                  <img
+                    src={physiqueIconSrc(v)}
+                    alt={v}
+                    width={18}
+                    height={18}
+                    className="h-4.5 w-4.5"
+                  />
+                </ToggleButton>
+              ))}
+            </FilterSection>
+          </div>
 
           <FilterSection label="メインビルド" color="red">
             {BUILD_VALUES.map((v) => {
-              const src = buildIconSrc(v);
+              const isActive = filters.build.includes(v);
               return (
                 <ToggleButton
                   key={v}
-                  active={filters.build.includes(v)}
+                  active={isActive}
                   onClick={() => toggleFilter("build", v)}
                 >
-                  {src ? (
-                    <img
-                      src={src}
-                      alt={v}
-                      width={16}
-                      height={16}
-                      className="h-4 w-4"
-                    />
-                  ) : (
-                    v
-                  )}
+                  <BuildIconImg
+                    buildType={v}
+                    size={16}
+                    className="h-4 w-4"
+                    invert={isActive}
+                  />
                 </ToggleButton>
               );
             })}
@@ -500,7 +591,26 @@ export default function CharacterListPage() {
           ))}
         </FilterSection>
 
-        {/* 緑: 並べ替え */}
+        {/* 青: 入手可不可 */}
+        <FilterSection label="入手可不可" color="blue">
+          {(
+            [
+              ["obtainable", "入手可"],
+              ["unobtainable", "入手不可"],
+              ["any", "不問"],
+            ] as [ObtainableFilter, string][]
+          ).map(([value, label]) => (
+            <ToggleButton
+              key={value}
+              active={obtainableFilter === value}
+              onClick={() => setObtainableFilter(value)}
+            >
+              {label}
+            </ToggleButton>
+          ))}
+        </FilterSection>
+
+        {/* 緑: 並べ替え（第1ソート + 昇降順） */}
         <FilterSection label="並べ替え" color="green">
           {SORT_FIELD_OPTIONS.map(({ key, label }) => (
             <ToggleButton
@@ -509,11 +619,12 @@ export default function CharacterListPage() {
               onClick={() => handleSortChange(key)}
             >
               {label}
+              {sortField === key && (sortDirection === "asc" ? " ↑" : " ↓")}
             </ToggleButton>
           ))}
         </FilterSection>
 
-        {/* 第二ソート（ラベルなし、少し上にスペース） */}
+        {/* 第二ソート */}
         <div className="flex flex-wrap gap-1 pt-1">
           {SECONDARY_SORT_OPTIONS.map(({ key, label }) => (
             <ToggleButton
@@ -531,32 +642,46 @@ export default function CharacterListPage() {
       {isLoading && (
         <div className="flex flex-col items-center gap-3 py-12">
           <div className="border-a-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
-          <p className="text-a-500 text-sm">データを読み込み中...</p>
+          <p className="text-a-500 text-base">データを読み込み中...</p>
         </div>
       )}
 
       {/* エラー */}
-      {error && <p className="py-12 text-center text-red-500">{error}</p>}
+      {error && (
+        <p className="py-12 text-center text-base text-red-500">{error}</p>
+      )}
 
       {/* データ */}
       {!isLoading && !error && (
         <>
-          <p className="text-a-500 mb-4 text-sm">
+          <p className="text-a-500 mb-4 text-base">
             {filteredCount !== totalCount
               ? `${filteredCount.toLocaleString()} 件ヒット（全 ${totalCount.toLocaleString()} 件）`
               : `全 ${totalCount.toLocaleString()} 件`}
           </p>
 
-          {/* PC: ヘッダー */}
-          <PCHeader sortLabel={sortLabel} />
+          {/* PC: グリッド表示 */}
+          <div className="hidden grid-cols-[73px_minmax(90px,auto)_minmax(0,auto)_minmax(52px,auto)_minmax(52px,auto)_minmax(52px,auto)_minmax(52px,auto)_minmax(0,auto)_minmax(0,auto)_minmax(0,auto)_50px] md:grid">
+            <PCHeader sortLabel={sortLabel} />
+            <div className="border-a-800 bg-a-950 col-span-full grid grid-cols-subgrid overflow-hidden rounded-lg border">
+              {visibleData.map((row) => (
+                <PCRow
+                  key={`${row.character_id}_${row.variant}`}
+                  row={row}
+                  sortField={sortField}
+                />
+              ))}
+            </div>
+          </div>
 
-          {/* リスト */}
-          <div>
+          {/* SP: カード表示 */}
+          <div className="border-a-800 bg-a-900 overflow-hidden rounded-lg border md:hidden">
             {visibleData.map((row) => (
-              <div key={`${row.character_id}_${row.variant}`}>
-                <PCRow row={row} sortField={sortField} />
-                <SPCard row={row} sortField={sortField} />
-              </div>
+              <SPCard
+                key={`${row.character_id}_${row.variant}`}
+                row={row}
+                sortField={sortField}
+              />
             ))}
           </div>
 
@@ -566,7 +691,7 @@ export default function CharacterListPage() {
           {hasMore && (
             <div className="flex items-center justify-center gap-2 py-4">
               <div className="border-a-500 h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
-              <p className="text-a-500 text-sm">読み込み中...</p>
+              <p className="text-a-500 text-base">読み込み中...</p>
             </div>
           )}
         </>
