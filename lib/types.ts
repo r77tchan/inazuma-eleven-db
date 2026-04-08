@@ -128,6 +128,7 @@ export type MinedCharacterRow = {
   full_name_ruby: string;
   nickname: string;
   nickname_ruby: string;
+  inagle_no: number | null;
   position: string;
   sub_position: string;
   element: string;
@@ -135,24 +136,45 @@ export type MinedCharacterRow = {
   physique: string;
   build_type: string;
   description: string;
-  kick_legend: number;
-  control_legend: number;
-  technique_legend: number;
-  pressure_legend: number;
-  physical_legend: number;
-  intelligence_legend: number;
-  agility_legend: number;
-  total_status_legend: number;
-  kick_basara: number;
-  control_basara: number;
-  technique_basara: number;
-  pressure_basara: number;
-  physical_basara: number;
-  intelligence_basara: number;
-  agility_basara: number;
-  total_status_basara: number;
   image_url: string;
   is_obtainable: boolean;
+  normal_slot_1: string | null;
+  normal_slot_2: string | null;
+  normal_slot_3: string | null;
+  normal_default_slot_4: string | null;
+  normal_default_slot_5: string | null;
+  normal_default_slot_6: string | null;
+  normal_branch_slot_4: string | null;
+  normal_branch_slot_5: string | null;
+  normal_branch_slot_6: string | null;
+
+  legend_status_type_default: number;
+  legend_status_type_branch: number;
+
+  inagle_url: string | null;
+  team: string[] | null;
+  works_flags: WorksFlags | null;
+  how_to_get: CharacterHowToGet[] | null;
+  generation: string | null;
+  school_year: string | null;
+  character_role: string | null;
+
+  created_at: string;
+  updated_at: string;
+};
+
+export type StatusTypeRow = {
+  id: number;
+  name: string;
+  rarity: string;
+  image_url: string | null;
+  kick: number | null;
+  control: number | null;
+  technique: number | null;
+  pressure: number | null;
+  physical: number | null;
+  intelligence: number | null;
+  agility: number | null;
   created_at: string;
   updated_at: string;
 };
@@ -162,27 +184,62 @@ export type MinedSkillRow = {
   name: string;
   name_ruby: string;
   type: string;
-  option: string;
-  tension: number;
-  power: number;
-  recast: number;
+  option: string | null;
   element: string;
   number_of_people: number;
   foul_rate: number;
-  is_mixi_max: boolean;
-  is_override: boolean;
+  description: string;
+  tension_normal: number | null;
+  power_normal: number | null;
+  recast_normal: number | null;
+  tension_mm: number | null;
+  power_mm: number | null;
+  recast_mm: number | null;
+  tension_or: number | null;
+  power_or: number | null;
+  recast_or: number | null;
+  tension_keshin: number | null;
+  power_keshin: number | null;
+  recast_keshin: number | null;
+  tension_soul: number | null;
+  power_soul: number | null;
+  recast_soul: number | null;
+  is_normal: boolean;
+  is_mm: boolean;
+  is_or: boolean;
   is_keshin: boolean;
   is_soul: boolean;
-  where_to_get: string;
-  image_url: string;
+  aura_id: string | null;
+  where_to_get: string | null;
+  image_url: string | null;
   created_at: string;
   updated_at: string;
 };
 
-export type MinedVoiceRow = {
-  id: string;
+export type MinedAuraRow = {
+  aura_id: string;
+  name: string;
+  name_ruby: string;
+  type: string;
+  category: string | null;
+  element: string;
+  description: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type MinedSkillVoiceRow = {
+  id: number;
   character_id: string;
   skill_id: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type MinedAuraVoiceRow = {
+  id: number;
+  character_id: string;
+  aura_id: string;
   created_at: string;
   updated_at: string;
 };
