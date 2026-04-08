@@ -243,3 +243,36 @@ export type MinedAuraVoiceRow = {
   created_at: string;
   updated_at: string;
 };
+
+export type MinedCharacterListView = {
+  character_id: string;
+  full_name: string;
+  nickname: string;
+  inagle_no: number | null;
+  position: string;
+  sub_position: string;
+  element: string;
+  physique: string;
+  build_type: string;
+  image_url: string;
+  is_obtainable: boolean;
+
+  default_shoot_at: number;
+  default_focus_at: number;
+  default_focus_df: number;
+  default_scramble_at: number;
+  default_scramble_df: number;
+  default_wall_df: number;
+  default_kp: number;
+
+  branch_shoot_at: number;
+  branch_focus_at: number;
+  branch_focus_df: number;
+  branch_scramble_at: number;
+  branch_scramble_df: number;
+  branch_wall_df: number;
+  branch_kp: number;
+
+  team: string | null;
+  character_role: string | null;
+};
