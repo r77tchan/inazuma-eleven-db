@@ -278,3 +278,77 @@ export type MinedCharacterListView = {
   team: string | null;
   character_role: string | null;
 };
+
+export type MinedCharacterDetailView = {
+  full_name: string;
+  full_name_ruby: string;
+  nickname: string;
+  inagle_no: number | null;
+  position: string;
+  sub_position: string;
+  element: string;
+  physique: string;
+  build_type: string;
+  description: string;
+  image_url: string;
+  normal_slot_1: string | null;
+  normal_slot_2: string | null;
+  normal_slot_3: string | null;
+  normal_default_slot_4: string | null;
+  normal_default_slot_5: string | null;
+  normal_default_slot_6: string | null;
+  normal_branch_slot_4: string | null;
+  normal_branch_slot_5: string | null;
+  normal_branch_slot_6: string | null;
+
+  default_shoot_at: number;
+  default_focus_at: number;
+  default_focus_df: number;
+  default_scramble_at: number;
+  default_scramble_df: number;
+  default_wall_df: number;
+  default_kp: number;
+
+  branch_shoot_at: number;
+  branch_focus_at: number;
+  branch_focus_df: number;
+  branch_scramble_at: number;
+  branch_scramble_df: number;
+  branch_wall_df: number;
+  branch_kp: number;
+
+  inagle_url: string | null;
+  team: string[] | null;
+  works_flags: WorksFlags | null;
+  how_to_get: CharacterHowToGet[] | null;
+  generation: string | null;
+  school_year: string | null;
+  character_role: string | null;
+};
+
+export type MinedSkillListView = {
+  skill_id: string;
+  name: string;
+  name_ruby: string;
+  type: string;
+  option: string | null;
+  element: string;
+  number_of_people: number;
+  description: string;
+  tension_normal: number | null;
+  power_normal: number | null;
+  tension_mm: number | null;
+  power_mm: number | null;
+  tension_or: number | null;
+  power_or: number | null;
+  tension_keshin: number | null;
+  power_keshin: number | null;
+  tension_soul: number | null;
+  power_soul: number | null;
+  is_normal: boolean;
+  is_mm: boolean;
+  is_or: boolean;
+  is_keshin: boolean;
+  is_soul: boolean;
+  image_url: string | null;
+};
