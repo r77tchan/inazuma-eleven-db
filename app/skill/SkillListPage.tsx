@@ -255,13 +255,17 @@ export default function SkillListPage() {
               active={filters.element.includes(v)}
               onClick={() => toggleFilter("element", v)}
             >
-              <img
-                src={ELEMENT_ICON[v]}
-                alt={v}
-                width={16}
-                height={16}
-                className="h-4 w-4"
-              />
+              {ELEMENT_ICON[v] ? (
+                <img
+                  src={ELEMENT_ICON[v]}
+                  alt={v}
+                  width={16}
+                  height={16}
+                  className="h-4 w-4"
+                />
+              ) : (
+                <span className="block h-4 w-4 rounded-sm bg-purple-600" />
+              )}
             </ToggleButton>
           ))}
         </FilterSection>
@@ -281,6 +285,12 @@ export default function SkillListPage() {
 
         {/* 青: 種類1 (ラジオ) */}
         <FilterSection label="種類1" color="blue">
+          <ToggleButton
+            active={filters.variant === "all"}
+            onClick={() => setFilter("variant", "all")}
+          >
+            全て
+          </ToggleButton>
           {VARIANT_KEYS.map((v) => (
             <ToggleButton
               key={v}
@@ -300,6 +310,12 @@ export default function SkillListPage() {
 
         {/* 青: 種類2 (ラジオ) */}
         <FilterSection label="種類2" color="blue">
+          <ToggleButton
+            active={filters.type === null}
+            onClick={() => setFilter("type", null)}
+          >
+            全て
+          </ToggleButton>
           {TYPE_VALUES.map((v) => (
             <ToggleButton
               key={v}

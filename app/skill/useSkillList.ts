@@ -57,7 +57,7 @@ function expandRows(
 // フィルタ定義
 // ======================================
 
-export const ELEMENT_VALUES = ["風", "林", "火", "山"] as const;
+export const ELEMENT_VALUES = ["風", "林", "火", "山", "無"] as const;
 
 // 種類2: type フィールドの値
 export const TYPE_VALUES = [
@@ -119,12 +119,12 @@ export type SortDirection = "asc" | "desc";
 // フィルタ状態
 // ======================================
 
-export type VariantSelection = VariantKey | "realSkill";
+export type VariantSelection = VariantKey | "realSkill" | "all";
 
 export type Filters = {
   element: string[];
   variant: VariantSelection;
-  type: string;
+  type: string | null;
   option: string | null;
   tension: number | null;
   numberOfPeople: number[];
@@ -160,8 +160,8 @@ export function useSkillList() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [filters, setFilters] = useState<Filters>({
     element: [],
-    variant: "normal",
-    type: "シュート技",
+    variant: "all",
+    type: null,
     option: null,
     tension: null,
     numberOfPeople: [],
@@ -205,9 +205,8 @@ export function useSkillList() {
         ) {
           next.type = OPTION_TYPE_MAP[value as string];
         }
-        // 種類1 変更時: option + tension をリセット
+        // 種類1 変更時: tension をリセット
         if (key === "variant") {
-          next.option = null;
           next.tension = null;
         }
         // 種類2上段 変更時: option + tension をリセット
@@ -243,7 +242,7 @@ export function useSkillList() {
     if (sortFieldRef.current === key) {
       setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
     } else {
-      setSortDirection(key === "power" || key === "element" ? "desc" : "asc");
+      setSortDirection(key === "power" ? "desc" : "asc");
     }
     sortFieldRef.current = key;
     setSortField(key);
@@ -264,8 +263,10 @@ export function useSkillList() {
     if (filters.element.length > 0) {
       result = result.filter((s) => filters.element.includes(s.element));
     }
-    // 種類2 上段: type (ラジオ)
-    result = result.filter((s) => s.type === filters.type);
+    // 種類2 上段: type (ラジオ, null=全て)
+    if (filters.type !== null) {
+      result = result.filter((s) => s.type === filters.type);
+    }
     // 種類2 下段: option (ラジオ, null=全て)
     if (filters.option !== null) {
       result = result.filter((s) => {
@@ -273,7 +274,7 @@ export function useSkillList() {
         return mapped === filters.option;
       });
     }
-    // 種類1: リアルスキル
+    // 種類1: バリアント
     if (filters.variant === "realSkill") {
       result = result.filter(
         (s) =>
@@ -283,8 +284,10 @@ export function useSkillList() {
           s.power_soul === REAL_SKILL_POWER ||
           s.power_mm === REAL_SKILL_POWER,
       );
+    } else if (filters.variant === "all") {
+      // 全て: フィルタなし（リアルスキルも含む）
     } else {
-      // 通常バリアント選択時: リアルスキル(power=30)を除外
+      // 特定バリアント選択時: リアルスキル(power=30)を除外
       const variantKey = filters.variant;
       result = result.filter(
         (s) => s[`power_${variantKey}`] !== REAL_SKILL_POWER,
@@ -310,16 +313,13 @@ export function useSkillList() {
   }, [allData, filters, searchTerm]);
 
   // --- 種類1 展開 ---
-  const expandedRows = useMemo(
-    () =>
-      expandRows(
-        preFiltered,
-        filters.variant === "realSkill"
-          ? VARIANT_KEYS.slice()
-          : [filters.variant],
-      ),
-    [preFiltered, filters.variant],
-  );
+  const expandedRows = useMemo(() => {
+    const variantFilter =
+      filters.variant === "realSkill" || filters.variant === "all"
+        ? VARIANT_KEYS.slice()
+        : [filters.variant];
+    return expandRows(preFiltered, variantFilter);
+  }, [preFiltered, filters.variant]);
 
   // --- テンション値一覧（展開後データから動的に取得） ---
   const tensionValues = useMemo(() => {
@@ -350,7 +350,13 @@ export function useSkillList() {
   const sortedData = useMemo(() => {
     const rows = [...tensionFiltered];
     const dir = sortDirection === "asc" ? 1 : -1;
-    const elementOrder: Record<string, number> = { 風: 0, 林: 1, 火: 2, 山: 3 };
+    const elementOrder: Record<string, number> = {
+      風: 0,
+      林: 1,
+      火: 2,
+      山: 3,
+      無: 4,
+    };
 
     rows.sort((a, b) => {
       if (sortField === "name") {
@@ -405,25 +411,11 @@ export function useSkillList() {
     return () => observer.disconnect();
   }, [hasMore]);
 
-  // --- 全件数 (種類1 + 種類2上段で変動) ---
+  // --- 全件数 (フィルタに依存しない基底数) ---
   const totalCount = useMemo(() => {
     if (!allData) return 0;
-    let base = allData.filter((s) => s.type === filters.type);
-    const v = filters.variant;
-    if (v === "realSkill") {
-      base = base.filter(
-        (s) =>
-          s.power_normal === REAL_SKILL_POWER ||
-          s.power_or === REAL_SKILL_POWER ||
-          s.power_keshin === REAL_SKILL_POWER ||
-          s.power_soul === REAL_SKILL_POWER ||
-          s.power_mm === REAL_SKILL_POWER,
-      );
-      return expandRows(base, VARIANT_KEYS.slice()).length;
-    }
-    base = base.filter((s) => s[`power_${v}`] !== REAL_SKILL_POWER);
-    return expandRows(base, [v]).length;
-  }, [allData, filters.variant, filters.type]);
+    return expandRows(allData, VARIANT_KEYS.slice()).length;
+  }, [allData]);
 
   return {
     isLoading,

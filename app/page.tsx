@@ -61,9 +61,7 @@ export default function Home() {
               className="mb-4 size-18"
             />
             <h4 className="mb-2 text-lg font-bold">必殺技</h4>
-            <p className="text-a-500 mb-4 text-sm">
-              一覧ページのみ実装済み。個別ページ未実装
-            </p>
+            <p className="text-a-500 mb-4 text-sm">ボイス情報未実装</p>
             <span className="bg-a-900 group-hover:bg-a-800 inline-block rounded-md px-4 py-2 text-sm font-medium transition">
               詳しく見る →
             </span>
@@ -76,7 +74,7 @@ export default function Home() {
         <h3 className="mb-4 text-xl font-bold">更新履歴</h3>
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
-            <time dateTime="2026-04-09">2026-04-09</time>: 必殺技一覧ページ作成
+            <time dateTime="2026-04-09">2026-04-09</time>: 必殺技ページ作成
           </li>
           <li>
             <time dateTime="2026-04-08">2026-04-08</time>:

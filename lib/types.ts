@@ -352,3 +352,13 @@ export type MinedSkillListView = {
   is_soul: boolean;
   image_url: string | null;
 };
+
+export type MinedSkillDetailView = MinedSkillListView & {
+  foul_rate: number;
+  recast_normal: number | null;
+  recast_mm: number | null;
+  recast_or: number | null;
+  recast_keshin: number | null;
+  recast_soul: number | null;
+  where_to_get: string | null;
+};
