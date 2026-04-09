@@ -162,14 +162,14 @@ function SkillCard({ row }: { row: SkillDisplayRow }) {
       <div className="flex gap-2 p-2 md:gap-3 md:p-3">
         {/* 画像: レスポンシブ */}
         <div
-          className="bg-a-700 shrink-0 overflow-hidden rounded"
-          style={{ width: "min(224px, 30vw)" }}
+          className="bg-a-700 h-25 shrink-0 overflow-hidden rounded md:h-full"
+          style={{ width: "min(224px, 30vw)", aspectRatio: "16 / 9" }}
         >
           {row.image_url && (
             <img
               src={row.image_url}
               alt={row.name}
-              className="h-25 w-full object-cover object-center md:h-full"
+              className="h-full w-full object-cover object-center"
               loading="lazy"
               onError={(e) => {
                 e.currentTarget.style.display = "none";
