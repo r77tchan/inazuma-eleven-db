@@ -51,7 +51,10 @@ export default function Home() {
             </span>
           </Link>
 
-          <span className="group border-a-800 cursor-not-allowed rounded-xl border p-6 transition">
+          <Link
+            href="/skill"
+            className="group border-a-800 hover:border-a-600 rounded-xl border p-6 transition hover:shadow-lg"
+          >
             <img
               src="https://dxi4wb638ujep.cloudfront.net/1/k/a/d/adammie74y0.webp"
               alt="必殺技"
@@ -59,12 +62,12 @@ export default function Home() {
             />
             <h4 className="mb-2 text-lg font-bold">必殺技</h4>
             <p className="text-a-500 mb-4 text-sm">
-              ボイス＆入手先を収録したい
+              一覧ページのみ実装済み。個別ページ未実装
             </p>
-            <span className="bg-a-900 inline-block rounded-md px-4 py-2 text-sm font-medium transition">
-              準備中
+            <span className="bg-a-900 group-hover:bg-a-800 inline-block rounded-md px-4 py-2 text-sm font-medium transition">
+              詳しく見る →
             </span>
-          </span>
+          </Link>
         </div>
       </section>
 
@@ -72,6 +75,9 @@ export default function Home() {
       <section className="mx-auto max-w-3xl px-4 pb-12">
         <h3 className="mb-4 text-xl font-bold">更新履歴</h3>
         <ul className="text-a-500 space-y-2 text-sm">
+          <li>
+            <time dateTime="2026-04-09">2026-04-09</time>: 必殺技一覧ページ作成
+          </li>
           <li>
             <time dateTime="2026-04-08">2026-04-08</time>:
             キャラクター一覧ページのリニューアル
