@@ -280,11 +280,13 @@ export default function SkillDetailContent({
         </section>
 
         {/* ===== ボイス情報 ===== */}
-        {voiceCharacters.length > 0 && (
-          <section>
-            <h2 className="border-a-400 mb-3 border-b pb-1 text-lg font-bold">
-              ボイス情報
-            </h2>
+        <section>
+          <h2 className="border-a-400 mb-3 border-b pb-1 text-lg font-bold">
+            ボイス情報
+          </h2>
+          {voiceCharacters.length === 0 ? (
+            <div className="text-a-500 text-sm">情報なし</div>
+          ) : (
             <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-3">
               {voiceCharacters.map((vc) => (
                 <Link
@@ -323,8 +325,8 @@ export default function SkillDetailContent({
                 </Link>
               ))}
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* ===== inagleリンク ===== */}
         <section>

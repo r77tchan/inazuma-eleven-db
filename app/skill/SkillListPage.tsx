@@ -95,10 +95,10 @@ function ToggleButton({
   return (
     <button
       onClick={onClick}
-      className={`rounded-md px-2.5 py-1 text-sm font-medium ${
+      className={`rounded-md border px-2.5 py-1 text-sm font-medium ${
         active
-          ? "bg-a-0 text-a-1000"
-          : "text-a-400 hover:text-a-200 bg-a-800 hover:bg-a-700"
+          ? "border-a-0 bg-a-0 text-a-1000"
+          : "text-a-400 hover:text-a-200 bg-a-800 hover:bg-a-700 hover:border-a-500 border-transparent"
       }`}
     >
       {children}
@@ -244,7 +244,7 @@ export default function SkillListPage() {
           placeholder="名前で検索..."
           value={searchTerm}
           onChange={(e) => handleSearchChange(e.target.value)}
-          className="border-a-700 bg-a-950 text-a-0 placeholder:text-a-500 focus:border-a-400 mb-4 w-full rounded-lg border px-4 py-2 text-base focus:outline-none"
+          className="border-a-700 bg-a-950 text-a-0 placeholder:text-a-500 hover:border-a-400 mb-4 w-full cursor-pointer rounded-lg border px-4 py-2 text-base focus:cursor-text focus:border-blue-500 focus:outline-none"
         />
 
         {/* 赤: 属性 */}

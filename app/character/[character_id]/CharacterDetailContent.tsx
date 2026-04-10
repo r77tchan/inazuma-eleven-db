@@ -540,10 +540,7 @@ function SkillSlotRow({
 }) {
   if (!skillId) {
     return (
-      <div
-        className="flex h-10 items-center rounded-xl border px-3 opacity-50"
-        style={{ borderColor: "#aaa" }}
-      />
+      <div className="flex h-10 items-center rounded-xl border border-black/15 px-3 opacity-50 dark:border-white/35" />
     );
   }
 
@@ -554,9 +551,8 @@ function SkillSlotRow({
   return (
     <Link
       href={`/skill/${encodeURIComponent(skillId)}`}
-      className="flex h-10 items-center justify-between rounded-xl border px-2 transition-colors hover:border-white"
+      className="flex h-10 items-center justify-between rounded-xl border border-black/15 bg-clip-padding px-2 hover:border-black dark:border-white/35 dark:hover:border-white"
       style={{
-        borderColor: "#aaa",
         backgroundImage: gradient,
       }}
     >
@@ -634,9 +630,8 @@ function AuraSlotRow({
 
   return (
     <div
-      className="flex h-10 items-center rounded-xl border px-2"
+      className="flex h-10 items-center rounded-xl border border-black/15 bg-clip-padding px-2 dark:border-white/35"
       style={{
-        borderColor: "#aaa",
         backgroundImage: gradient,
       }}
     >
@@ -813,20 +808,20 @@ export default function CharacterDetailContent({
                 <div className="bg-a-800 flex overflow-hidden rounded-full text-xs font-medium">
                   <button
                     onClick={() => setVariant("default")}
-                    className={`px-3 py-1 transition-colors ${
+                    className={`rounded-l-full border-y border-l px-3 py-1 ${
                       variant === "default"
-                        ? "bg-a-0 text-a-1000"
-                        : "text-a-400 hover:text-a-200"
+                        ? "border-a-0 bg-a-0 text-a-1000"
+                        : "text-a-400 hover:text-a-200 hover:border-a-500 border-transparent"
                     }`}
                   >
                     通常
                   </button>
                   <button
                     onClick={() => setVariant("branch")}
-                    className={`px-3 py-1 transition-colors ${
+                    className={`rounded-r-full border-y border-r px-3 py-1 ${
                       variant === "branch"
-                        ? "bg-a-0 text-a-1000"
-                        : "text-a-400 hover:text-a-200"
+                        ? "border-a-0 bg-a-0 text-a-1000"
+                        : "text-a-400 hover:text-a-200 hover:border-a-500 border-transparent"
                     }`}
                   >
                     分岐
@@ -1066,9 +1061,11 @@ export default function CharacterDetailContent({
         </section>
 
         {/* ===== ボイス情報 ===== */}
-        {voiceEntries.length > 0 && (
-          <section>
-            <SectionHeading>ボイス情報</SectionHeading>
+        <section>
+          <SectionHeading>ボイス情報</SectionHeading>
+          {voiceEntries.length === 0 ? (
+            <div className="text-a-500 text-sm">情報なし</div>
+          ) : (
             <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               {voiceEntries.map((entry, i) => {
                 const isSkill = entry.kind === "skill";
@@ -1118,9 +1115,8 @@ export default function CharacterDetailContent({
                     <Link
                       key={i}
                       href={`/skill/${encodeURIComponent(entry.id)}`}
-                      className="flex h-10 items-center rounded-xl border px-2 transition-colors hover:border-white"
+                      className="flex h-10 items-center rounded-xl border border-black/15 bg-clip-padding px-2 hover:border-black dark:border-white/35 dark:hover:border-white"
                       style={{
-                        borderColor: "#aaa",
                         backgroundImage: gradient,
                       }}
                     >
@@ -1129,9 +1125,8 @@ export default function CharacterDetailContent({
                   ) : (
                     <div
                       key={i}
-                      className="flex h-10 items-center rounded-xl border px-2"
+                      className="flex h-10 items-center rounded-xl border border-black/15 bg-clip-padding px-2 dark:border-white/35"
                       style={{
-                        borderColor: "#aaa",
                         backgroundImage: gradient,
                       }}
                     >
@@ -1144,8 +1139,8 @@ export default function CharacterDetailContent({
                 }
               })}
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* ===== inagleリンク ===== */}
         {c.inagle_url && (
