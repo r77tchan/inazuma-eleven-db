@@ -279,7 +279,18 @@ export type MinedCharacterListView = {
   character_role: string | null;
 };
 
+export type CharacterStats = {
+  kick: number;
+  control: number;
+  technique: number;
+  pressure: number;
+  physical: number;
+  intelligence: number;
+  agility: number;
+};
+
 export type MinedCharacterDetailView = {
+  character_id: string;
   full_name: string;
   full_name_ruby: string;
   nickname: string;
@@ -287,6 +298,7 @@ export type MinedCharacterDetailView = {
   position: string;
   sub_position: string;
   element: string;
+  gender: string;
   physique: string;
   build_type: string;
   description: string;
@@ -300,6 +312,9 @@ export type MinedCharacterDetailView = {
   normal_branch_slot_4: string | null;
   normal_branch_slot_5: string | null;
   normal_branch_slot_6: string | null;
+
+  default_status: CharacterStats;
+  branch_status: CharacterStats;
 
   default_shoot_at: number;
   default_focus_at: number;

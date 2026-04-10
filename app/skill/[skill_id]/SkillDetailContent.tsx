@@ -285,7 +285,7 @@ export default function SkillDetailContent({
               href={buildInagleSkillUrl(skill.name)}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm break-all text-blue-500 underline"
+              className="text-sm break-all text-blue-500 underline underline-offset-2"
             >
               「{skill.name}」を検索
             </a>
