@@ -24,12 +24,18 @@ export async function generateMetadata({
   const skill = await getSkillDetail(decodeURIComponent(skill_id));
 
   if (!skill) {
-    return { title: "必殺技情報 - イナズマイレブン DB" };
+    return { title: "イナイレDB - 必殺技詳細" };
   }
 
   return {
-    title: `${skill.name} | 必殺技情報 - イナズマイレブン DB`,
-    description: `${skill.type}「${skill.name}」の情報ページです。`,
+    title: `イナイレDB - ${skill.name}`,
+    description: `${skill.description}`,
+    openGraph: skill.image_url
+      ? { images: [{ url: skill.image_url }] }
+      : undefined,
+    twitter: skill.image_url
+      ? { card: "summary", images: [skill.image_url] }
+      : undefined,
   };
 }
 

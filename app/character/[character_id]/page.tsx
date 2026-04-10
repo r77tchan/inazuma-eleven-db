@@ -25,12 +25,18 @@ export async function generateMetadata({
   const character = await getCharacterDetail(decodeURIComponent(character_id));
 
   if (!character) {
-    return { title: "選手情報 - イナズマイレブン DB" };
+    return { title: "イナイレDB - 選手詳細" };
   }
 
   return {
-    title: `${character.full_name} | 選手情報 - イナズマイレブン DB`,
-    description: `${character.position}「${character.full_name}」の情報ページです。`,
+    title: `イナイレDB - ${character.full_name}`,
+    description: `${character.description}`,
+    openGraph: character.image_url
+      ? { images: [{ url: character.image_url }] }
+      : undefined,
+    twitter: character.image_url
+      ? { card: "summary", images: [character.image_url] }
+      : undefined,
   };
 }
 
