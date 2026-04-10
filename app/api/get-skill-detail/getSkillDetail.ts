@@ -3,6 +3,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 
 import { supabaseAdmin } from "@/lib/db/admin";
+import { withRetry } from "@/lib/supabaseRetry";
 import {
   SKILLS_LIST_CACHE_LIFE,
   SKILLS_LIST_CACHE_TAG,
@@ -46,15 +47,17 @@ export async function getAllSkillIds(): Promise<string[]> {
 
   for (let i = 0; ; i++) {
     const offset = i * CHUNK_SIZE;
-    const { data, error } = await supabaseAdmin
-      .from("mined_skills")
-      .select("skill_id")
-      .order("skill_id", { ascending: true })
-      .range(offset, offset + CHUNK_SIZE - 1);
-
-    if (error) throw new Error(`Supabase select failed: ${error.message}`);
-    const rows = data ?? [];
-    for (const r of rows) allIds.push((r as { skill_id: string }).skill_id);
+    const data = await withRetry(
+      () =>
+        supabaseAdmin
+          .from("mined_skills")
+          .select("skill_id")
+          .order("skill_id", { ascending: true })
+          .range(offset, offset + CHUNK_SIZE - 1),
+      "getAllSkillIds",
+    );
+    const rows = (data ?? []) as { skill_id: string }[];
+    for (const r of rows) allIds.push(r.skill_id);
     if (rows.length < CHUNK_SIZE) break;
   }
 
@@ -77,26 +80,28 @@ export async function getVoiceCharactersBySkillId(
   cacheLife(SKILLS_LIST_CACHE_LIFE);
   cacheTag(SKILLS_LIST_CACHE_TAG);
 
-  const { data, error } = await supabaseAdmin
-    .from("mined_skill_voices")
-    .select("character_id")
-    .eq("skill_id", skillId);
+  const voiceCharIds = await withRetry(
+    () =>
+      supabaseAdmin
+        .from("mined_skill_voices")
+        .select("character_id")
+        .eq("skill_id", skillId),
+    "getVoiceCharactersBySkillId:voices",
+  );
 
-  if (error)
-    throw new Error(`mined_skill_voices select failed: ${error.message}`);
-
-  const characterIds = (data ?? []).map(
-    (r: { character_id: string }) => r.character_id,
+  const characterIds = ((voiceCharIds ?? []) as { character_id: string }[]).map(
+    (r) => r.character_id,
   );
   if (characterIds.length === 0) return [];
 
-  const { data: chars, error: charErr } = await supabaseAdmin
-    .from("mined_characters")
-    .select("character_id, full_name, nickname, element, image_url")
-    .in("character_id", characterIds);
-
-  if (charErr)
-    throw new Error(`mined_characters select failed: ${charErr.message}`);
+  const chars = await withRetry(
+    () =>
+      supabaseAdmin
+        .from("mined_characters")
+        .select("character_id, full_name, nickname, element, image_url")
+        .in("character_id", characterIds),
+    "getVoiceCharactersBySkillId:chars",
+  );
 
   return (chars ?? []) as unknown as VoiceCharacter[];
 }

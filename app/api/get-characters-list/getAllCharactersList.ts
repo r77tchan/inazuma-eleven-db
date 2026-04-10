@@ -4,6 +4,7 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import { supabaseAdmin } from "@/lib/db/admin";
 import { calcStatus } from "@/lib/calcStatus";
+import { withRetry } from "@/lib/supabaseRetry";
 import {
   CHARACTERS_LIST_CACHE_LIFE,
   CHARACTERS_LIST_CACHE_TAG,
@@ -59,18 +60,20 @@ export default async function getAllCharactersList(): Promise<
 
   for (let chunkIndex = 0; ; chunkIndex++) {
     const offset = chunkIndex * CHUNK_SIZE;
-    const { data, error } = await supabaseAdmin
-      .from("mined_characters")
-      .select(
-        `character_id, full_name, full_name_ruby, nickname, nickname_ruby, inagle_no, position, sub_position,
+    const data = await withRetry(
+      () =>
+        supabaseAdmin
+          .from("mined_characters")
+          .select(
+            `character_id, full_name, full_name_ruby, nickname, nickname_ruby, inagle_no, position, sub_position,
          element, physique, build_type, image_url, is_obtainable, team, character_role,
          default_status:status_types!legend_status_type_default(kick, control, technique, pressure, physical, intelligence, agility),
          branch_status:status_types!legend_status_type_branch(kick, control, technique, pressure, physical, intelligence, agility)`,
-      )
-      .order("character_id", { ascending: true })
-      .range(offset, offset + CHUNK_SIZE - 1);
-
-    if (error) throw new Error(`Supabase select failed: ${error.message}`);
+          )
+          .order("character_id", { ascending: true })
+          .range(offset, offset + CHUNK_SIZE - 1),
+      "getAllCharactersList",
+    );
 
     const rows = (data ?? []) as unknown as JoinedRow[];
     allRows.push(...rows);

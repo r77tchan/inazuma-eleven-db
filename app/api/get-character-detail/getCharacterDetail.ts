@@ -4,6 +4,7 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import { supabaseAdmin } from "@/lib/db/admin";
 import { calcStatus } from "@/lib/calcStatus";
+import { withRetry } from "@/lib/supabaseRetry";
 import {
   CHARACTERS_LIST_CACHE_LIFE,
   CHARACTERS_LIST_CACHE_TAG,
@@ -134,17 +135,17 @@ export async function getAllCharacterIds(): Promise<string[]> {
 
   for (let i = 0; ; i++) {
     const offset = i * CHUNK_SIZE;
-    const { data, error } = await supabaseAdmin
-      .from("mined_characters")
-      .select("character_id")
-      .order("character_id", { ascending: true })
-      .range(offset, offset + CHUNK_SIZE - 1);
-
-    if (error) throw new Error(`Supabase select failed: ${error.message}`);
-    const rows = data ?? [];
-    for (const r of rows)
-      allIds.push((r as { character_id: string }).character_id);
-    if (rows.length < CHUNK_SIZE) break;
+    const rows = (await withRetry(
+      () =>
+        supabaseAdmin
+          .from("mined_characters")
+          .select("character_id")
+          .order("character_id", { ascending: true })
+          .range(offset, offset + CHUNK_SIZE - 1),
+      "getAllCharacterIds",
+    )) as { character_id: string }[] | null;
+    for (const r of rows ?? []) allIds.push(r.character_id);
+    if ((rows ?? []).length < CHUNK_SIZE) break;
   }
 
   return allIds;
@@ -166,15 +167,17 @@ export async function getAllStatusTypeData(): Promise<AllStatusTypeData> {
 
   for (let i = 0; ; i++) {
     const offset = i * CHUNK_SIZE;
-    const { data, error } = await supabaseAdmin
-      .from("status_types")
-      .select(
-        "kick, control, technique, pressure, physical, intelligence, agility",
-      )
-      .order("id", { ascending: true })
-      .range(offset, offset + CHUNK_SIZE - 1);
-
-    if (error) throw new Error(`Supabase select failed: ${error.message}`);
+    const data = await withRetry(
+      () =>
+        supabaseAdmin
+          .from("status_types")
+          .select(
+            "kick, control, technique, pressure, physical, intelligence, agility",
+          )
+          .order("id", { ascending: true })
+          .range(offset, offset + CHUNK_SIZE - 1),
+      "getAllStatusTypeData",
+    );
     const rows = (data ?? []) as unknown as CharacterStats[];
     allRows.push(...rows);
     if (rows.length < CHUNK_SIZE) break;
@@ -222,14 +225,16 @@ export async function getSkillInfoByIds(
   const uniqueIds = [...new Set(ids.filter(Boolean))];
   if (uniqueIds.length === 0) return {};
 
-  const { data, error } = await supabaseAdmin
-    .from("mined_skills")
-    .select(
-      "skill_id, name, type, element, option, tension_normal, power_normal",
-    )
-    .in("skill_id", uniqueIds);
-
-  if (error) throw new Error(`Supabase select failed: ${error.message}`);
+  const data = await withRetry(
+    () =>
+      supabaseAdmin
+        .from("mined_skills")
+        .select(
+          "skill_id, name, type, element, option, tension_normal, power_normal",
+        )
+        .in("skill_id", uniqueIds),
+    "getSkillInfoByIds",
+  );
 
   const map: Record<string, SkillSlotInfo> = {};
   for (const row of (data ?? []) as unknown as SkillSlotInfo[]) {
@@ -256,12 +261,14 @@ export async function getAuraInfoByIds(
   const uniqueIds = [...new Set(ids.filter(Boolean))];
   if (uniqueIds.length === 0) return {};
 
-  const { data, error } = await supabaseAdmin
-    .from("mined_auras")
-    .select("aura_id, name, type, element")
-    .in("aura_id", uniqueIds);
-
-  if (error) throw new Error(`Supabase select failed: ${error.message}`);
+  const data = await withRetry(
+    () =>
+      supabaseAdmin
+        .from("mined_auras")
+        .select("aura_id, name, type, element")
+        .in("aura_id", uniqueIds),
+    "getAuraInfoByIds",
+  );
 
   const map: Record<string, AuraSlotInfo> = {};
   for (const row of (data ?? []) as unknown as AuraSlotInfo[]) {
@@ -283,31 +290,30 @@ export async function getVoicesByCharacterId(
   cacheLife(CHARACTERS_LIST_CACHE_LIFE);
   cacheTag(CHARACTERS_LIST_CACHE_TAG);
 
-  const [skillRes, auraRes] = await Promise.all([
-    supabaseAdmin
-      .from("mined_skill_voices")
-      .select("skill_id")
-      .eq("character_id", characterId),
-    supabaseAdmin
-      .from("mined_aura_voices")
-      .select("aura_id")
-      .eq("character_id", characterId),
+  const [skillData, auraData] = await Promise.all([
+    withRetry(
+      () =>
+        supabaseAdmin
+          .from("mined_skill_voices")
+          .select("skill_id")
+          .eq("character_id", characterId),
+      "getVoicesByCharacterId:skills",
+    ),
+    withRetry(
+      () =>
+        supabaseAdmin
+          .from("mined_aura_voices")
+          .select("aura_id")
+          .eq("character_id", characterId),
+      "getVoicesByCharacterId:auras",
+    ),
   ]);
 
-  if (skillRes.error)
-    throw new Error(
-      `mined_skill_voices select failed: ${skillRes.error.message}`,
-    );
-  if (auraRes.error)
-    throw new Error(
-      `mined_aura_voices select failed: ${auraRes.error.message}`,
-    );
-
   const entries: VoiceEntry[] = [];
-  for (const r of (skillRes.data ?? []) as { skill_id: string }[]) {
+  for (const r of (skillData ?? []) as { skill_id: string }[]) {
     entries.push({ id: r.skill_id, kind: "skill" });
   }
-  for (const r of (auraRes.data ?? []) as { aura_id: string }[]) {
+  for (const r of (auraData ?? []) as { aura_id: string }[]) {
     entries.push({ id: r.aura_id, kind: "aura" });
   }
   return entries;

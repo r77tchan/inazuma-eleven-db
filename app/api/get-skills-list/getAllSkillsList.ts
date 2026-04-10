@@ -3,6 +3,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 
 import { supabaseAdmin } from "@/lib/db/admin";
+import { withRetry } from "@/lib/supabaseRetry";
 import {
   SKILLS_LIST_CACHE_LIFE,
   SKILLS_LIST_CACHE_TAG,
@@ -22,19 +23,21 @@ export default async function getAllSkillsList(): Promise<
 
   for (let chunkIndex = 0; ; chunkIndex++) {
     const offset = chunkIndex * CHUNK_SIZE;
-    const { data, error } = await supabaseAdmin
-      .from("mined_skills")
-      .select(
-        `skill_id, name, name_ruby, type, option, element, number_of_people,
+    const data = await withRetry(
+      () =>
+        supabaseAdmin
+          .from("mined_skills")
+          .select(
+            `skill_id, name, name_ruby, type, option, element, number_of_people,
          description, tension_normal, power_normal, tension_mm, power_mm,
          tension_or, power_or, tension_keshin, power_keshin,
          tension_soul, power_soul, is_normal, is_mm, is_or, is_keshin, is_soul,
          image_url, foul_rate, recast_normal, recast_mm, recast_or, recast_keshin, recast_soul`,
-      )
-      .order("skill_id", { ascending: true })
-      .range(offset, offset + CHUNK_SIZE - 1);
-
-    if (error) throw new Error(`Supabase select failed: ${error.message}`);
+          )
+          .order("skill_id", { ascending: true })
+          .range(offset, offset + CHUNK_SIZE - 1),
+      "getAllSkillsList",
+    );
 
     const rows = (data ?? []) as unknown as MinedSkillListView[];
     allRows.push(...rows);
