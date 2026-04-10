@@ -1069,7 +1069,7 @@ export default function CharacterDetailContent({
         {voiceEntries.length > 0 && (
           <section>
             <SectionHeading>ボイス情報</SectionHeading>
-            <div className="flex flex-col gap-2">
+            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
               {voiceEntries.map((entry, i) => {
                 const isSkill = entry.kind === "skill";
                 if (isSkill) {

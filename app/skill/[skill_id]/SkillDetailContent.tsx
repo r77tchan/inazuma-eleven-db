@@ -290,7 +290,7 @@ export default function SkillDetailContent({
                 <Link
                   key={vc.character_id}
                   href={`/character/${encodeURIComponent(vc.character_id)}`}
-                  className="border-a-700 bg-a-900 flex items-center gap-2 rounded-lg border p-2 transition-colors hover:border-white"
+                  className="border-a-700 bg-a-900 hover:border-a-300 flex items-center gap-2 rounded-lg border p-2"
                 >
                   <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">
                     <img
