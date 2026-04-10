@@ -110,7 +110,13 @@ function ToggleButton({
 // Skill カード（PC / SP共通）
 // =============================================
 
-function SkillCard({ row }: { row: SkillDisplayRow }) {
+function SkillCard({
+  row,
+  sortField,
+}: {
+  row: SkillDisplayRow;
+  sortField: SortFieldKey;
+}) {
   const bgColor = ELEMENT_BG[row.element] ?? ELEMENT_BG["無"];
   const optionLabel = mapOptionToFilter(row.option);
 
@@ -147,15 +153,27 @@ function SkillCard({ row }: { row: SkillDisplayRow }) {
           )}
           <span className="truncate text-base font-bold">{row.name}</span>
         </div>
-        {optionLabel && OPTION_ICON[optionLabel] && (
-          <img
-            src={OPTION_ICON[optionLabel]}
-            alt={optionLabel}
-            width={24}
-            height={24}
-            className="h-6 w-6 shrink-0"
-          />
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {optionLabel && OPTION_ICON[optionLabel] && (
+            <img
+              src={OPTION_ICON[optionLabel]}
+              alt={optionLabel}
+              width={24}
+              height={24}
+              className="h-6 w-6 shrink-0"
+            />
+          )}
+          {sortField === "recast" && (
+            <span className="text-a-0 text-[0.65rem] whitespace-nowrap">
+              リキャスト：{row.recast ?? "-"}
+            </span>
+          )}
+          {sortField === "foul" && (
+            <span className="text-a-0 text-[0.65rem] whitespace-nowrap">
+              ファウル：{row.foul_rate}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ボディ: 画像 + 説明 + ステータス */}
@@ -414,7 +432,11 @@ export default function SkillListPage() {
           {/* スキルリスト: PC 2列 / タブレット・SP 1列 */}
           <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             {visibleData.map((row) => (
-              <SkillCard key={`${row.skill_id}_${row.variant}`} row={row} />
+              <SkillCard
+                key={`${row.skill_id}_${row.variant}`}
+                row={row}
+                sortField={sortField}
+              />
             ))}
           </div>
 

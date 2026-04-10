@@ -366,14 +366,14 @@ export type MinedSkillListView = {
   is_keshin: boolean;
   is_soul: boolean;
   image_url: string | null;
-};
-
-export type MinedSkillDetailView = MinedSkillListView & {
   foul_rate: number;
   recast_normal: number | null;
   recast_mm: number | null;
   recast_or: number | null;
   recast_keshin: number | null;
   recast_soul: number | null;
+};
+
+export type MinedSkillDetailView = MinedSkillListView & {
   where_to_get: string | null;
 };

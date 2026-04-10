@@ -28,6 +28,7 @@ export type SkillDisplayRow = MinedSkillListView & {
   variant: VariantKey;
   tension: number | null;
   power: number | null;
+  recast: number | null;
 };
 
 function expandRows(
@@ -47,6 +48,7 @@ function expandRows(
         variant: v,
         tension: s[`tension_${v}`],
         power: s[`power_${v}`],
+        recast: s[`recast_${v}`],
       });
     }
   }
@@ -110,6 +112,8 @@ export const SORT_FIELD_OPTIONS = [
   { key: "name", label: "名前" },
   { key: "power", label: "威力" },
   { key: "element", label: "属性" },
+  { key: "recast", label: "リキャスト" },
+  { key: "foul", label: "ファウル" },
 ] as const;
 
 export type SortFieldKey = (typeof SORT_FIELD_OPTIONS)[number]["key"];
@@ -242,7 +246,9 @@ export function useSkillList() {
     if (sortFieldRef.current === key) {
       setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
     } else {
-      setSortDirection(key === "power" ? "desc" : "asc");
+      setSortDirection(
+        key === "power" || key === "recast" || key === "foul" ? "desc" : "asc",
+      );
     }
     sortFieldRef.current = key;
     setSortField(key);
@@ -376,6 +382,18 @@ export function useSkillList() {
         // 第2ソート: 名前降順
         const cmp = a.name_ruby.localeCompare(b.name_ruby, "ja");
         if (cmp !== 0) return cmp * -1;
+      } else if (sortField === "recast") {
+        const ar = a.recast ?? -Infinity;
+        const br = b.recast ?? -Infinity;
+        if (ar !== br) return (ar - br) * dir;
+        const cmp = a.name_ruby.localeCompare(b.name_ruby, "ja");
+        if (cmp !== 0) return cmp;
+      } else if (sortField === "foul") {
+        const af = a.foul_rate ?? -Infinity;
+        const bf = b.foul_rate ?? -Infinity;
+        if (af !== bf) return (af - bf) * dir;
+        const cmp = a.name_ruby.localeCompare(b.name_ruby, "ja");
+        if (cmp !== 0) return cmp;
       }
 
       // tie-break: skill_id + variant

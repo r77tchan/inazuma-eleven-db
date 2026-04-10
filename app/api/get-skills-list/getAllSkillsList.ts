@@ -29,7 +29,7 @@ export default async function getAllSkillsList(): Promise<
          description, tension_normal, power_normal, tension_mm, power_mm,
          tension_or, power_or, tension_keshin, power_keshin,
          tension_soul, power_soul, is_normal, is_mm, is_or, is_keshin, is_soul,
-         image_url`,
+         image_url, foul_rate, recast_normal, recast_mm, recast_or, recast_keshin, recast_soul`,
       )
       .order("skill_id", { ascending: true })
       .range(offset, offset + CHUNK_SIZE - 1);
