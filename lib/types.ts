@@ -375,5 +375,6 @@ export type MinedSkillListView = {
 };
 
 export type MinedSkillDetailView = MinedSkillListView & {
+  aura_id: string | null;
   where_to_get: string | null;
 };

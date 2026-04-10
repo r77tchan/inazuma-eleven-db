@@ -27,7 +27,7 @@ export async function getSkillDetail(
        tension_keshin, power_keshin, recast_keshin,
        tension_soul, power_soul, recast_soul,
        is_normal, is_mm, is_or, is_keshin, is_soul,
-       where_to_get, image_url`,
+       aura_id, where_to_get, image_url`,
     )
     .eq("skill_id", skillId)
     .single();
@@ -99,4 +99,29 @@ export async function getVoiceCharactersBySkillId(
     throw new Error(`mined_characters select failed: ${charErr.message}`);
 
   return (chars ?? []) as unknown as VoiceCharacter[];
+}
+
+/** aura_id から化身/ソウル情報を取得 */
+export type AuraInfo = {
+  aura_id: string;
+  name: string;
+  element: string;
+  type: string;
+};
+
+export async function getAuraByAuraId(
+  auraId: string,
+): Promise<AuraInfo | null> {
+  "use cache";
+  cacheLife(SKILLS_LIST_CACHE_LIFE);
+  cacheTag(SKILLS_LIST_CACHE_TAG);
+
+  const { data, error } = await supabaseAdmin
+    .from("mined_auras")
+    .select("aura_id, name, element, type")
+    .eq("aura_id", auraId)
+    .single();
+
+  if (error || !data) return null;
+  return data as unknown as AuraInfo;
 }

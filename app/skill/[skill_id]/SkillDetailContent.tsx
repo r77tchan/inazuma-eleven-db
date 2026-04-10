@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import type { MinedSkillDetailView } from "@/lib/types";
-import type { VoiceCharacter } from "@/app/api/get-skill-detail/getSkillDetail";
+import type {
+  VoiceCharacter,
+  AuraInfo,
+} from "@/app/api/get-skill-detail/getSkillDetail";
 
 // =============================================
 // アイコンマッピング
@@ -28,6 +31,12 @@ const ELEMENT_BG: Record<string, string> = {
   火: "#9f2121",
   山: "#976626",
   無: "#5f2181",
+};
+
+// 化身/ソウルアイコン
+const AURA_TYPE_ICON: Record<string, string> = {
+  化身: "/img/icons/super_skills/keshin.webp",
+  ソウル: "/img/icons/super_skills/soul.webp",
 };
 
 // option DB値 → 表示名
@@ -79,9 +88,11 @@ function buildInagleSkillUrl(name: string): string {
 export default function SkillDetailContent({
   skill,
   voiceCharacters,
+  auraInfo,
 }: {
   skill: MinedSkillDetailView;
   voiceCharacters: VoiceCharacter[];
+  auraInfo: AuraInfo | null;
 }) {
   const bgColor = ELEMENT_BG[skill.element] ?? ELEMENT_BG["無"];
   const activeVariants = getActiveVariants(skill);
@@ -258,26 +269,63 @@ export default function SkillDetailContent({
           </div>
         </section>
 
-        {/* ===== 入手方法 ===== */}
-        <section>
-          <h2 className="border-a-400 mb-3 border-b pb-1 text-lg font-bold">
-            入手方法
-          </h2>
-          <div className="bg-a-900 rounded-lg p-4">
-            {skill.where_to_get ? (
-              <p className="text-a-200 leading-relaxed whitespace-pre-wrap">
-                {skill.where_to_get.split(/\\n|\n/).map((line, i) => (
-                  <span key={i}>
-                    {i > 0 && <br />}
-                    {line}
+        {/* ===== 専用技 / 入手方法 ===== */}
+        {skill.is_keshin || skill.is_soul ? (
+          <section>
+            <h2 className="border-a-400 mb-3 border-b pb-1 text-lg font-bold">
+              専用技
+            </h2>
+            {auraInfo ? (
+              <div className="">
+                <div className="border-a-700 bg-a-900 inline-flex items-center gap-2 rounded-lg border p-2">
+                  {AURA_TYPE_ICON[auraInfo.type] && (
+                    <img
+                      src={AURA_TYPE_ICON[auraInfo.type]}
+                      alt={auraInfo.type}
+                      width={16}
+                      height={16}
+                      className="h-4 w-4 shrink-0"
+                    />
+                  )}
+                  {ELEMENT_ICON[auraInfo.element] && (
+                    <img
+                      src={ELEMENT_ICON[auraInfo.element]}
+                      alt={auraInfo.element}
+                      width={16}
+                      height={16}
+                      className="h-4 w-4 shrink-0"
+                    />
+                  )}
+                  <span className="truncate text-sm font-semibold">
+                    {auraInfo.name}
                   </span>
-                ))}
-              </p>
+                </div>
+              </div>
             ) : (
-              <p className="text-a-500">情報なし</p>
+              <div className="text-a-500 text-sm">情報なし</div>
             )}
-          </div>
-        </section>
+          </section>
+        ) : (
+          <section>
+            <h2 className="border-a-400 mb-3 border-b pb-1 text-lg font-bold">
+              入手方法
+            </h2>
+            <div className="bg-a-900 rounded-lg p-4">
+              {skill.where_to_get ? (
+                <p className="text-a-200 leading-relaxed whitespace-pre-wrap">
+                  {skill.where_to_get.split(/\\n|\n/).map((line, i) => (
+                    <span key={i}>
+                      {i > 0 && <br />}
+                      {line}
+                    </span>
+                  ))}
+                </p>
+              ) : (
+                <p className="text-a-500">情報なし</p>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* ===== ボイス情報 ===== */}
         <section>
