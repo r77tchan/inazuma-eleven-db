@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import {
   getSkillDetail,
   getAllSkillIds,
+  getVoiceCharactersBySkillId,
 } from "@/app/api/get-skill-detail/getSkillDetail";
 import SkillDetailContent from "./SkillDetailContent";
 
@@ -42,5 +43,9 @@ export default async function SkillDetailPage({
     notFound();
   }
 
-  return <SkillDetailContent skill={skill} />;
+  const voiceCharacters = await getVoiceCharactersBySkillId(
+    decodeURIComponent(skill_id),
+  );
+
+  return <SkillDetailContent skill={skill} voiceCharacters={voiceCharacters} />;
 }

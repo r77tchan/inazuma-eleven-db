@@ -12,6 +12,7 @@ import type { CalcStatusResult } from "@/lib/calcStatus";
 import type {
   SkillSlotInfo,
   AuraSlotInfo,
+  VoiceEntry,
 } from "@/app/api/get-character-detail/getCharacterDetail";
 
 // =============================================
@@ -676,12 +677,18 @@ export default function CharacterDetailContent({
   statMax,
   skillInfoMap,
   auraInfoMap,
+  voiceEntries,
+  voiceSkillInfoMap,
+  voiceAuraInfoMap,
 }: {
   character: MinedCharacterDetailView;
   statusTypeCalcStats: CalcStatusResult[];
   statMax: CharacterStats;
   skillInfoMap: Record<string, SkillSlotInfo>;
   auraInfoMap: Record<string, AuraSlotInfo>;
+  voiceEntries: VoiceEntry[];
+  voiceSkillInfoMap: Record<string, SkillSlotInfo>;
+  voiceAuraInfoMap: Record<string, AuraSlotInfo>;
 }) {
   const [variant, setVariant] = useState<"default" | "branch">("default");
   const [howToGetOpen, setHowToGetOpen] = useState(false);
@@ -1057,6 +1064,88 @@ export default function CharacterDetailContent({
             </div>
           )}
         </section>
+
+        {/* ===== ボイス情報 ===== */}
+        {voiceEntries.length > 0 && (
+          <section>
+            <SectionHeading>ボイス情報</SectionHeading>
+            <div className="flex flex-col gap-2">
+              {voiceEntries.map((entry, i) => {
+                const isSkill = entry.kind === "skill";
+                if (isSkill) {
+                  const info = voiceSkillInfoMap[entry.id];
+                  const gradient = info
+                    ? (SKILL_GRADIENT[info.element] ??
+                      "linear-gradient(90deg, #1117, #8885)")
+                    : "linear-gradient(90deg, #1117, #8885)";
+                  const isLink =
+                    entry.id.startsWith("wh") || entry.id.startsWith("rh");
+                  const inner = (
+                    <div className="flex min-w-0 items-center gap-2">
+                      {info && TYPE_ICON[info.type] && (
+                        <img
+                          src={TYPE_ICON[info.type]}
+                          alt={info.type}
+                          width={24}
+                          height={24}
+                          className="h-6 w-6 shrink-0"
+                        />
+                      )}
+                      {info && ELEMENT_ICON[info.element] && (
+                        <img
+                          src={ELEMENT_ICON[info.element]}
+                          alt={info.element}
+                          width={20}
+                          height={20}
+                          className="h-5 w-5 shrink-0"
+                        />
+                      )}
+                      <span className="min-w-0 truncate text-sm font-semibold">
+                        {info?.name ?? entry.id}
+                      </span>
+                      {info?.option && OPTION_ICON[info.option] && (
+                        <img
+                          src={OPTION_ICON[info.option]}
+                          alt={info.option}
+                          width={20}
+                          height={20}
+                          className="ml-auto h-5 w-5 shrink-0"
+                        />
+                      )}
+                    </div>
+                  );
+                  return isLink ? (
+                    <Link
+                      key={i}
+                      href={`/skill/${encodeURIComponent(entry.id)}`}
+                      className="flex h-10 items-center rounded-xl border px-2 transition-colors hover:border-white"
+                      style={{
+                        borderColor: "#aaa",
+                        backgroundImage: gradient,
+                      }}
+                    >
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div
+                      key={i}
+                      className="flex h-10 items-center rounded-xl border px-2"
+                      style={{
+                        borderColor: "#aaa",
+                        backgroundImage: gradient,
+                      }}
+                    >
+                      {inner}
+                    </div>
+                  );
+                } else {
+                  const info = voiceAuraInfoMap[entry.id];
+                  return <AuraSlotRow key={i} auraId={entry.id} info={info} />;
+                }
+              })}
+            </div>
+          </section>
+        )}
 
         {/* ===== inagleリンク ===== */}
         {c.inagle_url && (

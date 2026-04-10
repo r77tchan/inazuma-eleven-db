@@ -7,6 +7,7 @@ import {
   getAllStatusTypeData,
   getSkillInfoByIds,
   getAuraInfoByIds,
+  getVoicesByCharacterId,
 } from "@/app/api/get-character-detail/getCharacterDetail";
 import CharacterDetailContent from "./CharacterDetailContent";
 
@@ -72,6 +73,21 @@ export default async function CharacterDetailPage({
     getAuraInfoByIds(auraIds),
   ]);
 
+  // ボイス情報を取得
+  const voiceEntries = await getVoicesByCharacterId(
+    decodeURIComponent(character_id),
+  );
+  const voiceSkillIds = voiceEntries
+    .filter((v) => v.kind === "skill")
+    .map((v) => v.id);
+  const voiceAuraIds = voiceEntries
+    .filter((v) => v.kind === "aura")
+    .map((v) => v.id);
+  const [voiceSkillInfoMap, voiceAuraInfoMap] = await Promise.all([
+    getSkillInfoByIds(voiceSkillIds),
+    getAuraInfoByIds(voiceAuraIds),
+  ]);
+
   return (
     <CharacterDetailContent
       character={character}
@@ -79,6 +95,9 @@ export default async function CharacterDetailPage({
       statMax={statusTypeData.statMax}
       skillInfoMap={skillInfoMap}
       auraInfoMap={auraInfoMap}
+      voiceEntries={voiceEntries}
+      voiceSkillInfoMap={voiceSkillInfoMap}
+      voiceAuraInfoMap={voiceAuraInfoMap}
     />
   );
 }

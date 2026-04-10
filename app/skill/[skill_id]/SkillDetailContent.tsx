@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import type { MinedSkillDetailView } from "@/lib/types";
+import type { VoiceCharacter } from "@/app/api/get-skill-detail/getSkillDetail";
 
 // =============================================
 // アイコンマッピング
@@ -76,8 +78,10 @@ function buildInagleSkillUrl(name: string): string {
 
 export default function SkillDetailContent({
   skill,
+  voiceCharacters,
 }: {
   skill: MinedSkillDetailView;
+  voiceCharacters: VoiceCharacter[];
 }) {
   const bgColor = ELEMENT_BG[skill.element] ?? ELEMENT_BG["無"];
   const activeVariants = getActiveVariants(skill);
@@ -274,6 +278,53 @@ export default function SkillDetailContent({
             )}
           </div>
         </section>
+
+        {/* ===== ボイス情報 ===== */}
+        {voiceCharacters.length > 0 && (
+          <section>
+            <h2 className="border-a-400 mb-3 border-b pb-1 text-lg font-bold">
+              ボイス情報
+            </h2>
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-3">
+              {voiceCharacters.map((vc) => (
+                <Link
+                  key={vc.character_id}
+                  href={`/character/${encodeURIComponent(vc.character_id)}`}
+                  className="border-a-700 bg-a-900 flex items-center gap-2 rounded-lg border p-2 transition-colors hover:border-white"
+                >
+                  <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">
+                    <img
+                      src={vc.image_url}
+                      alt={vc.full_name}
+                      width={40}
+                      height={40}
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1">
+                      {ELEMENT_ICON[vc.element] && (
+                        <img
+                          src={ELEMENT_ICON[vc.element]}
+                          alt={vc.element}
+                          width={16}
+                          height={16}
+                          className="h-4 w-4 shrink-0"
+                        />
+                      )}
+                      <span className="truncate text-sm font-semibold">
+                        {vc.nickname}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ===== inagleリンク ===== */}
         <section>

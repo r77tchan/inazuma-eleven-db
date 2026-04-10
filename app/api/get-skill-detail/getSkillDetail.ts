@@ -60,3 +60,43 @@ export async function getAllSkillIds(): Promise<string[]> {
 
   return allIds;
 }
+
+/** スキルIDに紐づくボイスキャラクター情報を取得 */
+export type VoiceCharacter = {
+  character_id: string;
+  full_name: string;
+  nickname: string;
+  element: string;
+  image_url: string;
+};
+
+export async function getVoiceCharactersBySkillId(
+  skillId: string,
+): Promise<VoiceCharacter[]> {
+  "use cache";
+  cacheLife(SKILLS_LIST_CACHE_LIFE);
+  cacheTag(SKILLS_LIST_CACHE_TAG);
+
+  const { data, error } = await supabaseAdmin
+    .from("mined_skill_voices")
+    .select("character_id")
+    .eq("skill_id", skillId);
+
+  if (error)
+    throw new Error(`mined_skill_voices select failed: ${error.message}`);
+
+  const characterIds = (data ?? []).map(
+    (r: { character_id: string }) => r.character_id,
+  );
+  if (characterIds.length === 0) return [];
+
+  const { data: chars, error: charErr } = await supabaseAdmin
+    .from("mined_characters")
+    .select("character_id, full_name, nickname, element, image_url")
+    .in("character_id", characterIds);
+
+  if (charErr)
+    throw new Error(`mined_characters select failed: ${charErr.message}`);
+
+  return (chars ?? []) as unknown as VoiceCharacter[];
+}

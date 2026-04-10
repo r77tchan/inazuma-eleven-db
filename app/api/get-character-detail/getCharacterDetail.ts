@@ -269,3 +269,46 @@ export async function getAuraInfoByIds(
   }
   return map;
 }
+
+/** キャラクターIDに紐づくボイス情報(スキル+オーラ)を取得 */
+export type VoiceEntry = {
+  id: string;
+  kind: "skill" | "aura";
+};
+
+export async function getVoicesByCharacterId(
+  characterId: string,
+): Promise<VoiceEntry[]> {
+  "use cache";
+  cacheLife(CHARACTERS_LIST_CACHE_LIFE);
+  cacheTag(CHARACTERS_LIST_CACHE_TAG);
+
+  const [skillRes, auraRes] = await Promise.all([
+    supabaseAdmin
+      .from("mined_skill_voices")
+      .select("skill_id")
+      .eq("character_id", characterId),
+    supabaseAdmin
+      .from("mined_aura_voices")
+      .select("aura_id")
+      .eq("character_id", characterId),
+  ]);
+
+  if (skillRes.error)
+    throw new Error(
+      `mined_skill_voices select failed: ${skillRes.error.message}`,
+    );
+  if (auraRes.error)
+    throw new Error(
+      `mined_aura_voices select failed: ${auraRes.error.message}`,
+    );
+
+  const entries: VoiceEntry[] = [];
+  for (const r of (skillRes.data ?? []) as { skill_id: string }[]) {
+    entries.push({ id: r.skill_id, kind: "skill" });
+  }
+  for (const r of (auraRes.data ?? []) as { aura_id: string }[]) {
+    entries.push({ id: r.aura_id, kind: "aura" });
+  }
+  return entries;
+}
