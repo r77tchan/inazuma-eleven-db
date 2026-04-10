@@ -43,9 +43,7 @@ export default function Home() {
               className="mb-4 size-18"
             />
             <h4 className="mb-2 text-lg font-bold">キャラクター</h4>
-            <p className="text-a-500 mb-4 text-sm">
-              ボイス情報＆超次元枠未実装
-            </p>
+            <p className="text-a-500 mb-4 text-sm">ボイス情報未実装</p>
             <span className="bg-a-900 group-hover:bg-a-800 inline-block rounded-md px-4 py-2 text-sm font-medium transition">
               詳しく見る →
             </span>

@@ -9,7 +9,10 @@ import type {
   WorksFlags,
 } from "@/lib/types";
 import type { CalcStatusResult } from "@/lib/calcStatus";
-import type { SkillSlotInfo } from "@/app/api/get-character-detail/getCharacterDetail";
+import type {
+  SkillSlotInfo,
+  AuraSlotInfo,
+} from "@/app/api/get-character-detail/getCharacterDetail";
 
 // =============================================
 // アイコンマッピング
@@ -123,6 +126,16 @@ const SKILL_GRADIENT: Record<string, string> = {
   火: "linear-gradient(90deg, #1117, #f0303070)",
   山: "linear-gradient(90deg, #1117, #d0a05070)",
   無: "linear-gradient(90deg, #1117, #a12ec170)",
+};
+
+// オーラタイプ → アイコン
+const AURA_TYPE_ICON: Record<string, string> = {
+  化身: "/img/icons/super_skills/keshin.webp",
+  覚醒パワー: "/img/icons/super_skills/awakening_power.webp",
+  モードチェンジ: "/img/icons/super_skills/mode_change.webp",
+  ソウル: "/img/icons/super_skills/soul.webp",
+  ミキシトランス: "/img/icons/super_skills/mixi_trans.webp",
+  化身アームド: "/img/icons/super_skills/keshin_armed.webp",
 };
 
 const WORKS_LIST: {
@@ -604,6 +617,56 @@ function SkillSlotRow({
 }
 
 // =============================================
+// オーラスロット行
+// =============================================
+
+function AuraSlotRow({
+  auraId,
+  info,
+}: {
+  auraId: string;
+  info?: AuraSlotInfo;
+}) {
+  const gradient = info
+    ? (SKILL_GRADIENT[info.element] ?? "linear-gradient(90deg, #1117, #8885)")
+    : "linear-gradient(90deg, #1117, #8885)";
+
+  return (
+    <div
+      className="flex h-10 items-center rounded-xl border px-2"
+      style={{
+        borderColor: "#aaa",
+        backgroundImage: gradient,
+      }}
+    >
+      <div className="flex min-w-0 items-center gap-2">
+        {info && AURA_TYPE_ICON[info.type] && (
+          <img
+            src={AURA_TYPE_ICON[info.type]}
+            alt={info.type}
+            width={24}
+            height={24}
+            className="h-6 w-6 shrink-0"
+          />
+        )}
+        {info && ELEMENT_ICON[info.element] && (
+          <img
+            src={ELEMENT_ICON[info.element]}
+            alt={info.element}
+            width={20}
+            height={20}
+            className="h-5 w-5 shrink-0"
+          />
+        )}
+        <span className="min-w-0 truncate text-sm font-semibold">
+          {info?.name ?? auraId}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// =============================================
 // メインコンポーネント
 // =============================================
 
@@ -612,11 +675,13 @@ export default function CharacterDetailContent({
   statusTypeCalcStats,
   statMax,
   skillInfoMap,
+  auraInfoMap,
 }: {
   character: MinedCharacterDetailView;
   statusTypeCalcStats: CalcStatusResult[];
   statMax: CharacterStats;
   skillInfoMap: Record<string, SkillSlotInfo>;
+  auraInfoMap: Record<string, AuraSlotInfo>;
 }) {
   const [variant, setVariant] = useState<"default" | "branch">("default");
   const [howToGetOpen, setHowToGetOpen] = useState(false);
@@ -788,14 +853,32 @@ export default function CharacterDetailContent({
             習得スキル
           </h2>
           <div className="flex flex-col gap-2">
-            {currentSlots.map((skillId, i) => (
-              <SkillSlotRow
-                key={i}
-                skillId={skillId}
-                slotNumber={i + 1}
-                info={skillId ? skillInfoMap[skillId] : undefined}
-              />
-            ))}
+            {currentSlots.map((slotId, i) => {
+              if (!slotId) {
+                return (
+                  <SkillSlotRow key={i} skillId={null} slotNumber={i + 1} />
+                );
+              }
+              const isSkill =
+                slotId.startsWith("wh") || slotId.startsWith("rh");
+              if (isSkill) {
+                return (
+                  <SkillSlotRow
+                    key={i}
+                    skillId={slotId}
+                    slotNumber={i + 1}
+                    info={skillInfoMap[slotId]}
+                  />
+                );
+              }
+              return (
+                <AuraSlotRow
+                  key={i}
+                  auraId={slotId}
+                  info={auraInfoMap[slotId]}
+                />
+              );
+            })}
           </div>
         </section>
 

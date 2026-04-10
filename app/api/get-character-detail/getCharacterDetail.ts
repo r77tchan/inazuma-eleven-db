@@ -237,3 +237,35 @@ export async function getSkillInfoByIds(
   }
   return map;
 }
+
+/** オーラIDリストからオーラ情報を取得 */
+export type AuraSlotInfo = {
+  aura_id: string;
+  name: string;
+  type: string;
+  element: string;
+};
+
+export async function getAuraInfoByIds(
+  ids: string[],
+): Promise<Record<string, AuraSlotInfo>> {
+  "use cache";
+  cacheLife(CHARACTERS_LIST_CACHE_LIFE);
+  cacheTag(CHARACTERS_LIST_CACHE_TAG);
+
+  const uniqueIds = [...new Set(ids.filter(Boolean))];
+  if (uniqueIds.length === 0) return {};
+
+  const { data, error } = await supabaseAdmin
+    .from("mined_auras")
+    .select("aura_id, name, type, element")
+    .in("aura_id", uniqueIds);
+
+  if (error) throw new Error(`Supabase select failed: ${error.message}`);
+
+  const map: Record<string, AuraSlotInfo> = {};
+  for (const row of (data ?? []) as unknown as AuraSlotInfo[]) {
+    map[row.aura_id] = row;
+  }
+  return map;
+}

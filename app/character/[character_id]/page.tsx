@@ -6,6 +6,7 @@ import {
   getAllCharacterIds,
   getAllStatusTypeData,
   getSkillInfoByIds,
+  getAuraInfoByIds,
 } from "@/app/api/get-character-detail/getCharacterDetail";
 import CharacterDetailContent from "./CharacterDetailContent";
 
@@ -57,9 +58,18 @@ export default async function CharacterDetailPage({
     character.normal_branch_slot_6,
   ].filter((id): id is string => id !== null);
 
-  const [statusTypeData, skillInfoMap] = await Promise.all([
+  // スキルIDとオーラIDを分離
+  const skillIds = allSlotIds.filter(
+    (id) => id.startsWith("wh") || id.startsWith("rh"),
+  );
+  const auraIds = allSlotIds.filter(
+    (id) => !id.startsWith("wh") && !id.startsWith("rh"),
+  );
+
+  const [statusTypeData, skillInfoMap, auraInfoMap] = await Promise.all([
     getAllStatusTypeData(),
-    getSkillInfoByIds(allSlotIds),
+    getSkillInfoByIds(skillIds),
+    getAuraInfoByIds(auraIds),
   ]);
 
   return (
@@ -68,6 +78,7 @@ export default async function CharacterDetailPage({
       statusTypeCalcStats={statusTypeData.calcStats}
       statMax={statusTypeData.statMax}
       skillInfoMap={skillInfoMap}
+      auraInfoMap={auraInfoMap}
     />
   );
 }
