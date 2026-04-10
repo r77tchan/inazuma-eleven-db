@@ -139,19 +139,25 @@ function BuildIconImg({
     );
   // Light theme: dark icon / Dark theme: light icon
   // invert=true (active button): swap
-  const defaultSrc = invert ? srcs.light : srcs.dark;
+  const lightSrc = invert ? srcs.light : srcs.dark;
   const darkSrc = invert ? srcs.dark : srcs.light;
   return (
-    <picture>
-      <source srcSet={darkSrc} media="(prefers-color-scheme: dark)" />
+    <>
       <img
-        src={defaultSrc}
+        src={darkSrc}
         alt={buildType}
         width={size}
         height={size}
-        className={className}
+        className={`hidden dark:block ${className ?? ""}`}
       />
-    </picture>
+      <img
+        src={lightSrc}
+        alt={buildType}
+        width={size}
+        height={size}
+        className={`block dark:hidden ${className ?? ""}`}
+      />
+    </>
   );
 }
 
