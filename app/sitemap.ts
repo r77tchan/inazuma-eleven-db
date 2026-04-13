@@ -5,46 +5,51 @@ import { getAllSkillIds } from "@/app/api/get-skill-detail/getSkillDetail";
 
 const BASE_URL = "https://inazuma-eleven-db.vercel.app";
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // 静的ページ
-  const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: BASE_URL,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${BASE_URL}/character`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-    {
-      url: `${BASE_URL}/skill`,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.9,
-    },
-  ];
+/**
+ * サイトマップインデックスを生成。
+ * id=0: 静的ページ, id=1: キャラクター詳細, id=2: 必殺技詳細
+ * → /sitemap/0.xml, /sitemap/1.xml, /sitemap/2.xml
+ */
+export async function generateSitemaps() {
+  return [{ id: 0 }, { id: 1 }, { id: 2 }];
+}
 
-  // キャラクター詳細ページ（SSG）
-  const characterIds = await getAllCharacterIds();
-  const characterPages: MetadataRoute.Sitemap = characterIds.map((id) => ({
-    url: `${BASE_URL}/character/${encodeURIComponent(id)}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
-  }));
+export default async function sitemap(props: {
+  id: Promise<string>;
+}): Promise<MetadataRoute.Sitemap> {
+  const id = Number(await props.id);
 
-  // 必殺技詳細ページ（SSG）
+  // id=0: 静的ページ
+  if (id === 0) {
+    return [
+      {
+        url: BASE_URL,
+        lastModified: new Date(),
+      },
+      {
+        url: `${BASE_URL}/character`,
+        lastModified: new Date(),
+      },
+      {
+        url: `${BASE_URL}/skill`,
+        lastModified: new Date(),
+      },
+    ];
+  }
+
+  // id=1: キャラクター詳細ページ
+  if (id === 1) {
+    const characterIds = await getAllCharacterIds();
+    return characterIds.map((cid) => ({
+      url: `${BASE_URL}/character/${encodeURIComponent(cid)}`,
+      lastModified: new Date(),
+    }));
+  }
+
+  // id=2: 必殺技詳細ページ
   const skillIds = await getAllSkillIds();
-  const skillPages: MetadataRoute.Sitemap = skillIds.map((id) => ({
-    url: `${BASE_URL}/skill/${encodeURIComponent(id)}`,
+  return skillIds.map((sid) => ({
+    url: `${BASE_URL}/skill/${encodeURIComponent(sid)}`,
     lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.7,
   }));
-
-  return [...staticPages, ...characterPages, ...skillPages];
 }
