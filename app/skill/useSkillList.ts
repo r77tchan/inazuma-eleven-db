@@ -260,6 +260,22 @@ export function useSkillList() {
     setDisplayCount(PAGE_SIZE);
   }, []);
 
+  const resetAll = useCallback(() => {
+    setSearchTerm("");
+    setSortField("name");
+    sortFieldRef.current = "name";
+    setSortDirection("asc");
+    setFilters({
+      element: [],
+      variant: "all",
+      type: null,
+      option: null,
+      tension: null,
+      numberOfPeople: [],
+    });
+    setDisplayCount(PAGE_SIZE);
+  }, []);
+
   // --- フィルタリング (展開前) ---
   const preFiltered = useMemo(() => {
     if (!allData) return [];
@@ -452,5 +468,6 @@ export function useSkillList() {
     filteredCount: sortedData.length,
     hasMore,
     sentinelRef,
+    resetAll,
   };
 }

@@ -249,6 +249,7 @@ export default function SkillListPage() {
     filteredCount,
     hasMore,
     sentinelRef,
+    resetAll,
   } = useSkillList();
 
   return (
@@ -405,6 +406,16 @@ export default function SkillListPage() {
             </ToggleButton>
           ))}
         </FilterSection>
+
+        {/* リセット */}
+        <div className="flex">
+          <button
+            onClick={resetAll}
+            className="text-a-400 hover:text-a-0 hover:bg-a-800 rounded-md border border-transparent px-3 py-1 text-sm font-medium transition-colors hover:border-red-500"
+          >
+            すべてリセット
+          </button>
+        </div>
       </div>
 
       {/* ローディング */}

@@ -249,6 +249,24 @@ export function useCharacterList() {
     setDisplayCount(PAGE_SIZE);
   }, []);
 
+  const resetAll = useCallback(() => {
+    setSearchTerm("");
+    setAbillerMode("default");
+    setObtainableFilter("obtainable");
+    setSortField("inagle_no");
+    sortFieldRef.current = "inagle_no";
+    setSortDirection("asc");
+    setSecondarySort("inagle_no");
+    setFilters({
+      mainPosition: [],
+      subPosition: [],
+      element: [],
+      physique: [],
+      build: [],
+    });
+    setDisplayCount(PAGE_SIZE);
+  }, []);
+
   // --- フィルタリング ---
   const filteredData = useMemo(() => {
     if (!allData) return [];
@@ -388,5 +406,6 @@ export function useCharacterList() {
       abillerMode === "both" ? filteredData.length * 2 : filteredData.length,
     hasMore,
     sentinelRef,
+    resetAll,
   };
 }

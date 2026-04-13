@@ -462,6 +462,7 @@ export default function CharacterListPage() {
     filteredCount,
     hasMore,
     sentinelRef,
+    resetAll,
   } = useCharacterList();
 
   const availablePhysiques = PHYSIQUE_ORDER as readonly string[];
@@ -641,6 +642,16 @@ export default function CharacterListPage() {
               {label}
             </ToggleButton>
           ))}
+        </div>
+
+        {/* リセット */}
+        <div className="flex">
+          <button
+            onClick={resetAll}
+            className="text-a-400 hover:text-a-0 hover:bg-a-800 rounded-md border border-transparent px-3 py-1 text-sm font-medium transition-colors hover:border-red-500"
+          >
+            すべてリセット
+          </button>
         </div>
       </div>
 
