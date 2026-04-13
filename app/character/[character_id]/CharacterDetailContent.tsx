@@ -733,6 +733,12 @@ export default function CharacterDetailContent({
 
   return (
     <div className="mx-auto max-w-[800px] px-4 py-8">
+      <Link
+        href="/character"
+        className="mb-2 inline-flex items-center gap-1 text-sm text-blue-500 hover:underline"
+      >
+        ← キャラクター一覧へ戻る
+      </Link>
       <div className="flex flex-col gap-4">
         {/* ===== ヘッダー ===== */}
         <header className="flex gap-4 max-sm:flex-col max-sm:items-center">

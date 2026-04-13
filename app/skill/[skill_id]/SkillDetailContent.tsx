@@ -101,6 +101,12 @@ export default function SkillDetailContent({
 
   return (
     <div className="mx-auto max-w-[800px] px-4 py-8">
+      <Link
+        href="/skill"
+        className="mb-2 inline-flex items-center gap-1 text-sm text-blue-500 hover:underline"
+      >
+        ← 必殺技一覧へ戻る
+      </Link>
       <div className="flex flex-col gap-4">
         {/* ===== ヘッダー: アイコン + 技名 ===== */}
         <div
