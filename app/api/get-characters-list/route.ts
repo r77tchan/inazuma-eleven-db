@@ -17,7 +17,12 @@ export async function GET() {
         message: "キャラクター一覧を取得しました",
         data,
       },
-      { status: 200 },
+      {
+        status: 200,
+        headers: {
+          "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+        },
+      },
     );
   } catch (e) {
     return createApiFailureResponse(e);
