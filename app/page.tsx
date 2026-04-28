@@ -74,14 +74,8 @@ export default function Home() {
         <h3 className="mb-4 text-xl font-bold">更新履歴</h3>
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
-            <time dateTime="2026-04-10">2026-04-10</time>: ボイス情報追加
-          </li>
-          <li>
-            <time dateTime="2026-04-09">2026-04-09</time>: 必殺技ページ作成
-          </li>
-          <li>
-            <time dateTime="2026-04-08">2026-04-08</time>:
-            キャラクターページのリニューアル
+            <time dateTime="2026-04-28">2026-04-28</time>:
+            Vercel制限対策の為プリフェッチの無効化
           </li>
           <li>
             <time dateTime="2026-03-31">2026-03-31</time>:
