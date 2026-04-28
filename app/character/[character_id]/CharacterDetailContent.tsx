@@ -551,6 +551,7 @@ function SkillSlotRow({
   return (
     <Link
       href={`/skill/${encodeURIComponent(skillId)}`}
+      prefetch={false}
       className="flex h-10 items-center justify-between rounded-xl border border-black/15 bg-clip-padding px-2 hover:border-black dark:border-white/35 dark:hover:border-white"
       style={{
         backgroundImage: gradient,
@@ -735,6 +736,7 @@ export default function CharacterDetailContent({
     <div className="mx-auto max-w-[800px] px-4 py-8">
       <Link
         href="/character"
+        prefetch={false}
         className="mb-2 inline-flex items-center gap-1 text-sm text-blue-500 hover:underline"
       >
         ← キャラクター一覧へ戻る
@@ -1121,6 +1123,7 @@ export default function CharacterDetailContent({
                     <Link
                       key={i}
                       href={`/skill/${encodeURIComponent(entry.id)}`}
+                      prefetch={false}
                       className="flex h-10 items-center rounded-xl border border-black/15 bg-clip-padding px-2 hover:border-black dark:border-white/35 dark:hover:border-white"
                       style={{
                         backgroundImage: gradient,

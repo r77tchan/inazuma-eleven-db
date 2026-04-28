@@ -35,6 +35,7 @@ export default function Home() {
         <div className="grid gap-6 sm:grid-cols-2">
           <Link
             href="/character"
+            prefetch={false}
             className="group border-a-800 hover:border-a-600 rounded-xl border p-6 transition hover:shadow-lg"
           >
             <img
@@ -51,6 +52,7 @@ export default function Home() {
 
           <Link
             href="/skill"
+            prefetch={false}
             className="group border-a-800 hover:border-a-600 rounded-xl border p-6 transition hover:shadow-lg"
           >
             <img

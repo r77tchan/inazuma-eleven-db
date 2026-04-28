@@ -103,6 +103,7 @@ export default function SkillDetailContent({
     <div className="mx-auto max-w-[800px] px-4 py-8">
       <Link
         href="/skill"
+        prefetch={false}
         className="mb-2 inline-flex items-center gap-1 text-sm text-blue-500 hover:underline"
       >
         ← 必殺技一覧へ戻る
@@ -346,6 +347,7 @@ export default function SkillDetailContent({
                 <Link
                   key={vc.character_id}
                   href={`/character/${encodeURIComponent(vc.character_id)}`}
+                  prefetch={false}
                   className="border-a-700 bg-a-900 hover:border-a-300 flex items-center gap-2 rounded-lg border p-2"
                 >
                   <div className="h-10 w-10 shrink-0 overflow-hidden rounded-md">

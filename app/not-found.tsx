@@ -11,6 +11,7 @@ export default function NotFound() {
         </p>
         <Link
           href="/"
+          prefetch={false}
           className="mt-6 inline-block text-sm font-medium underline underline-offset-4"
         >
           トップへ戻る
