@@ -259,6 +259,7 @@ function PCRow({
   return (
     <Link
       href={`/character/${row.character_id}`}
+      prefetch={false}
       className="border-a-800 col-span-full grid grid-cols-subgrid items-center gap-x-2.5 border-b px-3 py-2 text-sm last:border-b-0 hover:bg-[#3273dc40]"
     >
       {/* ソート値 */}
@@ -361,6 +362,7 @@ function SPCard({
   return (
     <Link
       href={`/character/${row.character_id}`}
+      prefetch={false}
       className="border-a-800 bg-a-950 flex gap-2.5 border-b p-2 last:border-b-0 hover:bg-[#3273dc40]"
     >
       {/* 左: アイコン（大きめ） */}

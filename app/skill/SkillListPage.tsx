@@ -123,6 +123,7 @@ function SkillCard({
   return (
     <Link
       href={`/skill/${row.skill_id}`}
+      prefetch={false}
       className="bg-a-950 border-a-800 hover:border-a-600 flex flex-col overflow-hidden rounded-lg border hover:shadow-lg"
     >
       {/* ヘッダー: 属性グラデーション + 種類アイコン + 属性アイコン + 名前 + option */}
