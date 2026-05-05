@@ -75,6 +75,10 @@ export default function Home() {
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
             <time dateTime="2026-05-06">2026-05-06</time>:
+            一部別バージョンが存在する必殺技のボイス情報が入力されていなかった問題を修正
+          </li>
+          <li>
+            <time dateTime="2026-05-06">2026-05-06</time>:
             複数の化身が同じ必殺技を所持している場合に全ての化身情報が表示されるよう修正
           </li>
           <li>

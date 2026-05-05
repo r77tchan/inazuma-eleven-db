@@ -94,6 +94,10 @@ export default async function CharacterDetailPage({
     getAuraInfoByIds(voiceAuraIds),
   ]);
 
+  const filteredVoiceEntries = voiceEntries.filter(
+    (v) => v.kind !== "skill" || v.id in voiceSkillInfoMap,
+  );
+
   return (
     <CharacterDetailContent
       character={character}
@@ -101,7 +105,7 @@ export default async function CharacterDetailPage({
       statMax={statusTypeData.statMax}
       skillInfoMap={skillInfoMap}
       auraInfoMap={auraInfoMap}
-      voiceEntries={voiceEntries}
+      voiceEntries={filteredVoiceEntries}
       voiceSkillInfoMap={voiceSkillInfoMap}
       voiceAuraInfoMap={voiceAuraInfoMap}
     />
