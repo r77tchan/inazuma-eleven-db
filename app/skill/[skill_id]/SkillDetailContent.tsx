@@ -287,7 +287,7 @@ export default function SkillDetailContent({
                 {auraInfos.map((aura) => (
                   <div
                     key={aura.aura_id}
-                    className="border-a-700 bg-a-900 inline-flex items-center gap-2 rounded-lg border p-2"
+                    className="border-a-700 bg-a-900 inline-flex cursor-not-allowed items-center gap-2 rounded-lg border p-2"
                   >
                     {AURA_TYPE_ICON[aura.type] && (
                       <img
