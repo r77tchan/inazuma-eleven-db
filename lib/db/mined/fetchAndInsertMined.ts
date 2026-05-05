@@ -1,6 +1,6 @@
 // 実行方法:
 // npm run dev した状態で:
-// npx tsx --env-file=.env.local lib/db/mined/fetchAndUpsertMined.ts
+// npx tsx --env-file=.env.local lib/db/mined/fetchAndInsertMined.ts
 
 import { createClient } from "@supabase/supabase-js";
 
