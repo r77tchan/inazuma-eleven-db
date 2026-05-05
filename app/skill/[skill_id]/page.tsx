@@ -5,9 +5,8 @@ import {
   getSkillDetail,
   getAllSkillIds,
   getVoiceCharactersBySkillId,
-  getAuraByAuraId,
+  getAurasByAuraIds,
 } from "@/app/api/get-skill-detail/getSkillDetail";
-import type { AuraInfo } from "@/app/api/get-skill-detail/getSkillDetail";
 import SkillDetailContent from "./SkillDetailContent";
 
 export async function generateStaticParams() {
@@ -55,17 +54,21 @@ export default async function SkillDetailPage({
     decodeURIComponent(skill_id),
   );
 
-  // 化身/ソウル技の場合、aura情報を取得
-  let auraInfo: AuraInfo | null = null;
-  if ((skill.is_keshin || skill.is_soul) && skill.aura_id) {
-    auraInfo = await getAuraByAuraId(skill.aura_id);
-  }
+  // 化身/ソウル技の場合、aura情報を取得 (aura_id は「、」区切りで複数IDが入りうる)
+  const auraIds =
+    (skill.is_keshin || skill.is_soul) && skill.aura_id
+      ? skill.aura_id
+          .split("、")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [];
+  const auraInfos = await getAurasByAuraIds(auraIds);
 
   return (
     <SkillDetailContent
       skill={skill}
       voiceCharacters={voiceCharacters}
-      auraInfo={auraInfo}
+      auraInfos={auraInfos}
     />
   );
 }

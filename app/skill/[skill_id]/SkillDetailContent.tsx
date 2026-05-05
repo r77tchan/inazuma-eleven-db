@@ -88,11 +88,11 @@ function buildInagleSkillUrl(name: string): string {
 export default function SkillDetailContent({
   skill,
   voiceCharacters,
-  auraInfo,
+  auraInfos,
 }: {
   skill: MinedSkillDetailView;
   voiceCharacters: VoiceCharacter[];
-  auraInfo: AuraInfo | null;
+  auraInfos: AuraInfo[];
 }) {
   const bgColor = ELEMENT_BG[skill.element] ?? ELEMENT_BG["無"];
   const activeVariants = getActiveVariants(skill);
@@ -282,31 +282,36 @@ export default function SkillDetailContent({
             <h2 className="border-a-400 mb-3 border-b pb-1 text-lg font-bold">
               専用技
             </h2>
-            {auraInfo ? (
-              <div className="">
-                <div className="border-a-700 bg-a-900 inline-flex items-center gap-2 rounded-lg border p-2">
-                  {AURA_TYPE_ICON[auraInfo.type] && (
-                    <img
-                      src={AURA_TYPE_ICON[auraInfo.type]}
-                      alt={auraInfo.type}
-                      width={16}
-                      height={16}
-                      className="h-4 w-4 shrink-0"
-                    />
-                  )}
-                  {ELEMENT_ICON[auraInfo.element] && (
-                    <img
-                      src={ELEMENT_ICON[auraInfo.element]}
-                      alt={auraInfo.element}
-                      width={16}
-                      height={16}
-                      className="h-4 w-4 shrink-0"
-                    />
-                  )}
-                  <span className="truncate text-sm font-semibold">
-                    {auraInfo.name}
-                  </span>
-                </div>
+            {auraInfos.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {auraInfos.map((aura) => (
+                  <div
+                    key={aura.aura_id}
+                    className="border-a-700 bg-a-900 inline-flex items-center gap-2 rounded-lg border p-2"
+                  >
+                    {AURA_TYPE_ICON[aura.type] && (
+                      <img
+                        src={AURA_TYPE_ICON[aura.type]}
+                        alt={aura.type}
+                        width={16}
+                        height={16}
+                        className="h-4 w-4 shrink-0"
+                      />
+                    )}
+                    {ELEMENT_ICON[aura.element] && (
+                      <img
+                        src={ELEMENT_ICON[aura.element]}
+                        alt={aura.element}
+                        width={16}
+                        height={16}
+                        className="h-4 w-4 shrink-0"
+                      />
+                    )}
+                    <span className="truncate text-sm font-semibold">
+                      {aura.name}
+                    </span>
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="text-a-500 text-sm">情報なし</div>

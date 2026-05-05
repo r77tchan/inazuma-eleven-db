@@ -114,19 +114,26 @@ export type AuraInfo = {
   type: string;
 };
 
-export async function getAuraByAuraId(
-  auraId: string,
-): Promise<AuraInfo | null> {
+export async function getAurasByAuraIds(
+  auraIds: string[],
+): Promise<AuraInfo[]> {
   "use cache";
   cacheLife(SKILLS_LIST_CACHE_LIFE);
   cacheTag(SKILLS_LIST_CACHE_TAG);
 
+  if (auraIds.length === 0) return [];
+
   const { data, error } = await supabaseAdmin
     .from("mined_auras")
     .select("aura_id, name, element, type")
-    .eq("aura_id", auraId)
-    .single();
+    .in("aura_id", auraIds);
 
-  if (error || !data) return null;
-  return data as unknown as AuraInfo;
+  if (error || !data) return [];
+
+  const map = new Map(
+    (data as unknown as AuraInfo[]).map((row) => [row.aura_id, row]),
+  );
+  return auraIds
+    .map((id) => map.get(id))
+    .filter((row): row is AuraInfo => row != null);
 }
