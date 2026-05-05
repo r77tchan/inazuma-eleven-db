@@ -631,7 +631,7 @@ function AuraSlotRow({
 
   return (
     <div
-      className="flex h-10 items-center rounded-xl border border-black/15 bg-clip-padding px-2 dark:border-white/35"
+      className="flex h-10 cursor-not-allowed items-center rounded-xl border border-black/15 bg-clip-padding px-2 dark:border-white/35"
       style={{
         backgroundImage: gradient,
       }}
