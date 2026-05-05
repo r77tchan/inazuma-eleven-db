@@ -1018,19 +1018,24 @@ export default function CharacterDetailContent({
             className="border-a-400 mb-3 flex w-full cursor-pointer items-center justify-between border-b pb-1 text-left text-lg font-bold"
           >
             入手方法
-            <svg
-              className={`h-5 w-5 transition-transform ${howToGetOpen ? "rotate-180" : ""}`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            <span className="ml-auto flex items-center gap-1">
+              <span className="text-a-500 text-xs font-normal">
+                タップで開閉
+              </span>
+              <svg
+                className={`h-5 w-5 transition-transform ${howToGetOpen ? "rotate-180" : ""}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </span>
           </button>
           {howToGetOpen && (
             <div className="flex flex-col gap-4">
