@@ -56,7 +56,7 @@ export default function ThemeToggle() {
           onClick={() => setTheme(value)}
           aria-label={label}
           title={label}
-          className={`flex items-center justify-center rounded-full p-1.5 transition-colors ${
+          className={`flex cursor-pointer items-center justify-center rounded-full p-1.5 transition-colors ${
             theme === value
               ? "bg-white/20 text-white"
               : "text-white/50 hover:text-white/80"
