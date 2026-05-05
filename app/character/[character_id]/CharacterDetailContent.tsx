@@ -816,7 +816,7 @@ export default function CharacterDetailContent({
                 <div className="bg-a-800 flex overflow-hidden rounded-full text-xs font-medium">
                   <button
                     onClick={() => setVariant("default")}
-                    className={`rounded-l-full border-y border-l px-3 py-1 ${
+                    className={`cursor-pointer rounded-l-full border-y border-l px-3 py-1 ${
                       variant === "default"
                         ? "border-a-0 bg-a-0 text-a-1000"
                         : "text-a-400 hover:text-a-200 hover:border-a-500 border-transparent"
@@ -826,7 +826,7 @@ export default function CharacterDetailContent({
                   </button>
                   <button
                     onClick={() => setVariant("branch")}
-                    className={`rounded-r-full border-y border-r px-3 py-1 ${
+                    className={`cursor-pointer rounded-r-full border-y border-r px-3 py-1 ${
                       variant === "branch"
                         ? "border-a-0 bg-a-0 text-a-1000"
                         : "text-a-400 hover:text-a-200 hover:border-a-500 border-transparent"
@@ -1015,7 +1015,7 @@ export default function CharacterDetailContent({
         <section>
           <button
             onClick={() => setHowToGetOpen(!howToGetOpen)}
-            className="border-a-400 mb-3 flex w-full items-center justify-between border-b pb-1 text-left text-lg font-bold"
+            className="border-a-400 mb-3 flex w-full cursor-pointer items-center justify-between border-b pb-1 text-left text-lg font-bold"
           >
             入手方法
             <svg
