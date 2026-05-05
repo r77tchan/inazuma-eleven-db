@@ -95,7 +95,7 @@ function ToggleButton({
   return (
     <button
       onClick={onClick}
-      className={`rounded-md border px-2.5 py-1 text-sm font-medium ${
+      className={`cursor-pointer rounded-md border px-2.5 py-1 text-sm font-medium ${
         active
           ? "border-a-0 bg-a-0 text-a-1000"
           : "text-a-400 hover:text-a-200 bg-a-800 hover:bg-a-700 hover:border-a-500 border-transparent"
@@ -412,7 +412,7 @@ export default function SkillListPage() {
         <div className="flex">
           <button
             onClick={resetAll}
-            className="text-a-400 hover:text-a-0 hover:bg-a-800 rounded-md border border-transparent px-3 py-1 text-sm font-medium transition-colors hover:border-red-500"
+            className="text-a-400 hover:text-a-0 hover:bg-a-800 cursor-pointer rounded-md border border-transparent px-3 py-1 text-sm font-medium transition-colors hover:border-red-500"
           >
             すべてリセット
           </button>
