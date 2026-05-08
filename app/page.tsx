@@ -74,22 +74,6 @@ export default function Home() {
         <h3 className="mb-4 text-xl font-bold">更新履歴</h3>
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
-            <time dateTime="2026-05-06">2026-05-06</time>:
-            一部別バージョンが存在する必殺技のボイス情報が入力されていなかった問題を修正
-          </li>
-          <li>
-            <time dateTime="2026-05-06">2026-05-06</time>:
-            複数の化身が同じ必殺技を所持している場合に全ての化身情報が表示されるよう修正
-          </li>
-          <li>
-            <time dateTime="2026-05-06">2026-05-06</time>:
-            一部別バージョンが存在するキャラクターのボイス情報が入力されていなかった問題を修正
-          </li>
-          <li>
-            <time dateTime="2026-04-28">2026-04-28</time>:
-            Vercel制限対策の為プリフェッチの無効化
-          </li>
-          <li>
             <time dateTime="2026-03-31">2026-03-31</time>:
             オリオン後半アップデート収録
           </li>
