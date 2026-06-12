@@ -74,6 +74,10 @@ export default function Home() {
         <h3 className="mb-4 text-xl font-bold">更新履歴</h3>
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
+            <time dateTime="2026-06-13">2026-06-13</time>:
+            公式大会アップデート収録
+          </li>
+          <li>
             <time dateTime="2026-03-31">2026-03-31</time>:
             オリオン後半アップデート収録
           </li>
