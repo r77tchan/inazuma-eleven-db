@@ -74,6 +74,16 @@ export default function Home() {
         <h3 className="mb-4 text-xl font-bold">更新履歴</h3>
         <ul className="text-a-500 space-y-2 text-sm">
           <li>
+            <time dateTime="2026-07-10">2026-07-10</time>:{" "}
+            <Link
+              href="/update/2026-07-06"
+              prefetch={false}
+              className="text-blue-500 underline underline-offset-2"
+            >
+              栄光への挑戦者たちアップデート収録（2026-07-06）
+            </Link>
+          </li>
+          <li>
             <time dateTime="2026-06-13">2026-06-13</time>:{" "}
             <Link
               href="/update/2026-06-11"
